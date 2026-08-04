@@ -8,43 +8,14 @@ const EMPTY_FORM = {
   metaAccessToken: "",
   metaPhoneNumberId: "",
   metaVerifyToken: "",
-  aiProvider: "ollama",
+  aiProvider: "gemini",
   geminiApiKey: "",
 };
 
 function CredentialsPanel({ onClose }) {
   const [formData, setFormData] = useState(EMPTY_FORM);
-  const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [webhookUrl, setWebhookUrl] = useState("");
-
-  useEffect(() => {
-    const loadCredentials = async () => {
-      try {
-        const response = await fetch(getBackendUrl("/credentials"));
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          console.error(data.message || "Could not load credentials.");
-          return;
-        }
-
-        if (data.credentials) {
-          setFormData({
-            ...EMPTY_FORM,
-            ...data.credentials,
-          });
-        }
-      } catch (error) {
-        console.error("Could not load credentials:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadCredentials();
-  }, []);
 
   useEffect(() => {
     const loadWebhookUrl = async () => {
@@ -119,11 +90,12 @@ function CredentialsPanel({ onClose }) {
           </button>
         </div>
 
-        {isLoading ? (
-          <p className="modal-loading">Loading credentials…</p>
-        ) : (
-          <form className="modal-body" onSubmit={handleSubmit}>
-            <h3 className="form-section-title">Google Sheets</h3>
+        <form className="modal-body" onSubmit={handleSubmit}>
+          <p className="field-hint" style={{ marginBottom: 16 }}>
+            Fill in your API keys below, then click Save Credentials.
+          </p>
+
+          <h3 className="form-section-title">Google Sheets</h3>
 
             <label className="form-label">Google Client ID</label>
             <input
@@ -246,10 +218,9 @@ function CredentialsPanel({ onClose }) {
               disabled={isSaving}
               style={{ width: "100%", marginTop: 20 }}
             >
-              {isSaving ? "Saving…" : "Save Credentials"}
-            </button>
-          </form>
-        )}
+            {isSaving ? "Saving…" : "Save Credentials"}
+          </button>
+        </form>
       </div>
     </div>
   );

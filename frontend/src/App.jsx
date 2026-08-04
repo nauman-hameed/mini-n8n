@@ -14,29 +14,11 @@ import { createNode } from "./utils/nodeFactory";
 import { getBackendUrl, syncWorkflow } from "./utils/api";
 import { getWorkflowSteps } from "./utils/workflowSteps";
 
-const NODES_STORAGE_KEY = "mini-n8n-nodes";
-const EDGES_STORAGE_KEY = "mini-n8n-edges";
-
-const getSavedData = (key) => {
-  try {
-    const savedData = localStorage.getItem(key);
-    return savedData ? JSON.parse(savedData) : [];
-  } catch (error) {
-    console.error(`Could not load ${key}:`, error);
-    return [];
-  }
-};
-
 function App() {
   const [view, setView] = useState("landing");
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(
-    () => getSavedData(NODES_STORAGE_KEY)
-  );
-
-  const [edges, setEdges] = useState(
-    () => getSavedData(EDGES_STORAGE_KEY)
-  );
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges] = useState([]);
 
   const [workflowResult, setWorkflowResult] = useState(null);
   const [executedNodes, setExecutedNodes] = useState([]);
@@ -51,30 +33,6 @@ function App() {
   const [notifications, setNotifications] = useState([]);
 
   const notificationTimers = useRef({});
-
-  useEffect(() => {
-    localStorage.setItem(NODES_STORAGE_KEY, JSON.stringify(nodes));
-  }, [nodes]);
-
-  useEffect(() => {
-    localStorage.setItem(EDGES_STORAGE_KEY, JSON.stringify(edges));
-  }, [edges]);
-
-  useEffect(() => {
-    if (view !== "editor" || nodes.length === 0) {
-      return undefined;
-    }
-
-    const timer = setTimeout(async () => {
-      try {
-        await syncWorkflow(nodes, edges);
-      } catch (error) {
-        console.error("Workflow sync failed:", error);
-      }
-    }, 1200);
-
-    return () => clearTimeout(timer);
-  }, [nodes, edges, view]);
 
   useEffect(() => {
     if (!isRunning || executionSteps.length === 0) {
@@ -122,7 +80,16 @@ function App() {
     delete notificationTimers.current[id];
   };
 
-  const openEditor = () => setView("editor");
+  const openEditor = () => {
+    localStorage.removeItem("mini-n8n-nodes");
+    localStorage.removeItem("mini-n8n-edges");
+    localStorage.removeItem("mini-n8n-view");
+    setNodes([]);
+    setEdges([]);
+    setWorkflowResult(null);
+    setExecutedNodes([]);
+    setView("editor");
+  };
 
   const addNode = (nodeType) => {
     const nodeAlreadyExists = nodes.some(
