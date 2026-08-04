@@ -1,4 +1,5 @@
 import json
+import re
 
 import requests
 
@@ -60,11 +61,73 @@ def execute_ai_extractor(message: str) -> dict:
     provider = get_ai_provider()
 
     if provider == "gemini":
-        extracted_data = extract_with_gemini(message)
+        try:
+            extracted_data = extract_with_gemini(message)
+        except ValueError as error:
+            if "429" in str(error) or "quota" in str(error).lower():
+                print(
+                    "Gemini quota exceeded — "
+                    "using simple fallback extractor."
+                )
+                extracted_data = extract_with_simple_fallback(
+                    message
+                )
+            else:
+                raise
     else:
         extracted_data = extract_with_ollama(message)
 
     return normalize_extracted_data(extracted_data)
+
+
+def extract_with_simple_fallback(message: str) -> dict:
+    phone_match = re.search(
+        r"(?:phone|ph|mobile)\s*[:\-]\s*([+\d\s-]{10,15})",
+        message,
+        re.IGNORECASE,
+    )
+    phone = phone_match.group(1).strip() if phone_match else ""
+
+    if not phone:
+        digits_match = re.search(
+            r"(\+?\d{10,15}|03\d{9})",
+            message,
+        )
+        phone = digits_match.group(1) if digits_match else ""
+
+    name_match = re.search(
+        r"(?:name)\s*[:\-]\s*([^,\n]+)",
+        message,
+        re.IGNORECASE,
+    )
+    name = name_match.group(1).strip() if name_match else ""
+
+    address_match = re.search(
+        r"(?:address)\s*[:\-]\s*([^,\n]+)",
+        message,
+        re.IGNORECASE,
+    )
+    address = (
+        address_match.group(1).strip() if address_match else ""
+    )
+
+    items_match = re.search(
+        r"(?:want|order|items?)\s+(.+?)(?:\.\s*name|\.\s*address|name:|address:|phone:|$)",
+        message,
+        re.IGNORECASE | re.DOTALL,
+    )
+    items = (
+        items_match.group(1).strip()
+        if items_match
+        else message.strip()
+    )
+
+    return {
+        "name": name,
+        "phone": phone,
+        "address": address,
+        "items": items,
+    }
 
 
 def normalize_extracted_data(extracted_data: dict) -> dict:
