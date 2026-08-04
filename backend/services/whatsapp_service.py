@@ -206,4 +206,9 @@ def extract_meta_error(response_data: dict) -> str:
 
 def normalize_phone_number(phone: str) -> str:
     digits = re.sub(r"\D", "", phone)
+
+    # Pakistan local format: 03XXXXXXXXX → 923XXXXXXXXX
+    if digits.startswith("0") and len(digits) == 11:
+        digits = "92" + digits[1:]
+
     return digits

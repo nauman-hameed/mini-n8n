@@ -179,6 +179,13 @@ def run_workflow(
                 or last_output.get("phone", "")
             ).strip()
 
+            if not last_output.get("from_phone") and last_output.get("phone"):
+                print(
+                    "WhatsApp Reply: using extracted phone "
+                    f"{last_output.get('phone')} — set Test Phone "
+                    "on WhatsApp Trigger for manual runs."
+                )
+
             whatsapp_send = None
 
             if recipient_phone:
