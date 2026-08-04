@@ -68,7 +68,7 @@
       "data": {
         "label": "WhatsApp Reply",
         "nodeType": "whatsappReply",
-        "replyMessage": "Hi Ali Khan \ud83d\udc4b\n\nYour order has been received successfully.\n\nItems:\n2 Blue Shirts\n..."
+        "replyMessage": "Hi {{name}} \ud83d\udc4b\n\nYour order has been received successfully.\n\nItems:\n{{items}}\n\nWe will contact you at {{phone}}."
       },
       "measured": {
         "width": 183,

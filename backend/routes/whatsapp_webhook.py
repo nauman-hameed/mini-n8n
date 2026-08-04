@@ -1,4 +1,4 @@
-from fastapi import APIRouter, BackgroundTasks, Query, Request
+from fastapi import APIRouter, Query, Request
 from fastapi.responses import (
     JSONResponse,
     PlainTextResponse,
@@ -177,7 +177,6 @@ def verify_whatsapp_webhook(
 @router.post("/webhook/whatsapp")
 async def receive_whatsapp_message(
     request: Request,
-    background_tasks: BackgroundTasks,
 ):
     try:
         body = await request.json()
@@ -191,10 +190,7 @@ async def receive_whatsapp_message(
         incoming_messages = parse_incoming_messages(body)
 
         for message_data in incoming_messages:
-            background_tasks.add_task(
-                process_whatsapp_message,
-                message_data,
-            )
+            process_whatsapp_message(message_data)
 
         return {
             "success": True,

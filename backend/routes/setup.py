@@ -9,7 +9,7 @@ from config import (
 )
 from services.ai_extractor import get_ai_provider
 from services.credentials_service import load_credentials
-from services.execution_log import LAST_WEBHOOK_RUN
+from services.execution_log import load_last_webhook_run
 from services.workflow_store import load_workflow
 from services.whatsapp_service import get_meta_credentials
 
@@ -89,5 +89,5 @@ def setup_status():
             and get_ai_provider() == "gemini"
             and bool(str(GEMINI_API_KEY or "").strip())
         ),
-        "last_webhook_run": LAST_WEBHOOK_RUN,
+        "last_webhook_run": load_last_webhook_run(),
     }

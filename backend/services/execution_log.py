@@ -1,4 +1,12 @@
 from datetime import datetime, timezone
+import json
+from pathlib import Path
+
+LOG_FILE = (
+    Path(__file__).resolve().parent.parent
+    / "storage"
+    / "last_webhook_run.json"
+)
 
 LAST_WEBHOOK_RUN: dict = {
     "status": "idle",
@@ -7,6 +15,26 @@ LAST_WEBHOOK_RUN: dict = {
     "error": "",
     "finished_at": "",
 }
+
+
+def _persist_log() -> None:
+    LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
+    LOG_FILE.write_text(
+        json.dumps(LAST_WEBHOOK_RUN, indent=2),
+        encoding="utf-8",
+    )
+
+
+def load_last_webhook_run() -> dict:
+    if LOG_FILE.exists():
+        try:
+            return json.loads(
+                LOG_FILE.read_text(encoding="utf-8")
+            )
+        except json.JSONDecodeError:
+            pass
+
+    return LAST_WEBHOOK_RUN.copy()
 
 
 def record_webhook_start(from_phone: str, message: str) -> None:
@@ -19,6 +47,8 @@ def record_webhook_start(from_phone: str, message: str) -> None:
             "finished_at": "",
         }
     )
+    _persist_log(    )
+    _persist_log()
 
 
 def record_webhook_success() -> None:
@@ -29,6 +59,7 @@ def record_webhook_success() -> None:
             "finished_at": datetime.now(timezone.utc).isoformat(),
         }
     )
+    _persist_log()
 
 
 def record_webhook_error(error: str) -> None:
@@ -39,3 +70,4 @@ def record_webhook_error(error: str) -> None:
             "finished_at": datetime.now(timezone.utc).isoformat(),
         }
     )
+    _persist_log()
