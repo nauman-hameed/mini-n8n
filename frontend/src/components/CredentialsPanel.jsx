@@ -14,20 +14,49 @@ const EMPTY_FORM = {
 
 function CredentialsPanel({ onClose }) {
   const [formData, setFormData] = useState(EMPTY_FORM);
+  const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState("");
   const [webhookUrl, setWebhookUrl] = useState("");
 
-  useEffect(() => {
-    const loadWebhookUrl = async () => {
-      try {
-        const url = await fetchWebhookUrl();
-        setWebhookUrl(url);
-      } catch (error) {
-        console.error("Could not load webhook URL:", error);
+  const loadCredentials = async () => {
+    try {
+      const response = await fetch(getBackendUrl("/credentials"));
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error(data.message || "Could not load credentials.");
+        return;
       }
+
+      if (data.credentials && Object.keys(data.credentials).length > 0) {
+        setFormData({
+          ...EMPTY_FORM,
+          ...data.credentials,
+        });
+      }
+    } catch (error) {
+      console.error("Could not load credentials:", error);
+    }
+  };
+
+  useEffect(() => {
+    const loadPanelData = async () => {
+      setIsLoading(true);
+
+      await Promise.all([
+        loadCredentials(),
+        fetchWebhookUrl()
+          .then(setWebhookUrl)
+          .catch((error) => {
+            console.error("Could not load webhook URL:", error);
+          }),
+      ]);
+
+      setIsLoading(false);
     };
 
-    loadWebhookUrl();
+    loadPanelData();
   }, []);
 
   const updateField = (field, value) => {
@@ -54,12 +83,13 @@ function CredentialsPanel({ onClose }) {
       const data = await response.json();
 
       if (!response.ok) {
+        setSaveMessage("");
         alert(data.message || "Could not save credentials.");
         return;
       }
 
-      alert(data.message);
-      onClose();
+      setSaveMessage("Credentials saved securely.");
+      await loadCredentials();
     } catch (error) {
       console.error("Credentials error:", error);
       alert("Backend connection failed.");
@@ -90,12 +120,25 @@ function CredentialsPanel({ onClose }) {
           </button>
         </div>
 
-        <form className="modal-body" onSubmit={handleSubmit}>
-          <p className="field-hint" style={{ marginBottom: 16 }}>
-            Fill in your API keys below, then click Save Credentials.
-          </p>
+        {isLoading ? (
+          <p className="modal-loading">Loading credentials…</p>
+        ) : (
+          <form className="modal-body" onSubmit={handleSubmit}>
+            <p className="field-hint" style={{ marginBottom: 16 }}>
+              Fill in your API keys below, then click Save Credentials.
+              Saved values reload when you reopen this panel.
+            </p>
 
-          <h3 className="form-section-title">Google Sheets</h3>
+            {saveMessage && (
+              <p
+                className="field-hint"
+                style={{ color: "#4ade80", marginBottom: 16 }}
+              >
+                {saveMessage}
+              </p>
+            )}
+
+            <h3 className="form-section-title">Google Sheets</h3>
 
             <label className="form-label">Google Client ID</label>
             <input
@@ -221,6 +264,7 @@ function CredentialsPanel({ onClose }) {
             {isSaving ? "Saving…" : "Save Credentials"}
           </button>
         </form>
+        )}
       </div>
     </div>
   );
