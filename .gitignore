@@ -14,6 +14,7 @@ frontend/node_modules/
 backend/storage/credentials.json
 backend/storage/workflow.json
 backend/railway-vars.raw.env
+backend/teacher-handoff.txt
 backend/tokens/
 backend/credentials/
 
