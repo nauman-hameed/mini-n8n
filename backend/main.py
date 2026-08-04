@@ -23,6 +23,9 @@ from routes.whatsapp_webhook import (
 from routes.workflow import (
     router as workflow_router,
 )
+from routes.setup import (
+    router as setup_router,
+)
 
 
 print("APP_ENV:", APP_ENV)
@@ -48,6 +51,9 @@ app.include_router(whatsapp_webhook_router)
 
 # Saved workflow routes (for WhatsApp triggers)
 app.include_router(workflow_router)
+
+# Production diagnostics
+app.include_router(setup_router)
 
 
 allowed_origins = [

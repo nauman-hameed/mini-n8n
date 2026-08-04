@@ -26,7 +26,11 @@ if not BACKEND_URL and _railway_domain:
 
 ADMIN_PIN = os.getenv("ADMIN_PIN")
 
-AI_PROVIDER = os.getenv("AI_PROVIDER")
+AI_PROVIDER = _clean_env(os.getenv("AI_PROVIDER")) or (
+    "gemini"
+    if os.getenv("RAILWAY_PUBLIC_DOMAIN")
+    else None
+)
 OLLAMA_URL = os.getenv("OLLAMA_URL")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
