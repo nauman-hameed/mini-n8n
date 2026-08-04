@@ -5,8 +5,16 @@ load_dotenv()
 
 APP_ENV = os.getenv("APP_ENV")
 
-CREDENTIAL_ENCRYPTION_KEY = os.getenv(
-    "CREDENTIAL_ENCRYPTION_KEY"
+def _clean_env(value: str | None) -> str | None:
+    if value is None:
+        return None
+
+    cleaned = value.strip().strip('"').strip("'")
+    return cleaned or None
+
+
+CREDENTIAL_ENCRYPTION_KEY = _clean_env(
+    os.getenv("CREDENTIAL_ENCRYPTION_KEY")
 )
 
 FRONTEND_URL = os.getenv("FRONTEND_URL")
@@ -35,4 +43,6 @@ META_API_VERSION = os.getenv("META_API_VERSION", "v23.0")
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI")
-GOOGLE_SPREADSHEET_ID = os.getenv("GOOGLE_SPREADSHEET_ID")
+GOOGLE_SPREADSHEET_ID = _clean_env(
+    os.getenv("GOOGLE_SPREADSHEET_ID")
+)
