@@ -19,6 +19,9 @@ from routes.credentials import (
 from routes.whatsapp_webhook import (
     router as whatsapp_webhook_router,
 )
+from routes.workflow import (
+    router as workflow_router,
+)
 
 
 print("APP_ENV:", APP_ENV)
@@ -36,6 +39,9 @@ app.include_router(credentials_router)
 
 # Meta WhatsApp webhook routes
 app.include_router(whatsapp_webhook_router)
+
+# Saved workflow routes (for WhatsApp triggers)
+app.include_router(workflow_router)
 
 
 allowed_origins = [

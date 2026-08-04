@@ -230,6 +230,23 @@ function Canvas({
                     updateSelectedNode({ message: event.target.value })
                   }
                 />
+
+                <label className="form-label" style={{ marginTop: 12 }}>
+                  Test Phone (optional)
+                </label>
+                <input
+                  className="form-input"
+                  type="text"
+                  placeholder="923001234567"
+                  value={selectedNode.data.testPhone || ""}
+                  onChange={(event) =>
+                    updateSelectedNode({ testPhone: event.target.value })
+                  }
+                />
+                <p className="field-hint">
+                  Used for manual runs to send a real WhatsApp confirmation.
+                  Live messages use the sender&apos;s number from Meta webhook.
+                </p>
               </>
             )}
 
@@ -280,7 +297,7 @@ function Canvas({
                 <label className="form-label">Reply Message</label>
                 <textarea
                   className="form-textarea"
-                  placeholder="Thank you {{name}}! Your order for {{items}} has been received."
+                  placeholder="Thank you {{name}}! Your order for {{items}} has been received. We'll reach you at {{phone}}."
                   value={selectedNode.data.replyMessage || ""}
                   onChange={(event) =>
                     updateSelectedNode({ replyMessage: event.target.value })

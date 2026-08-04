@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getBackendUrl } from "../utils/api";
+import { fetchWebhookUrl, getBackendUrl } from "../utils/api";
 
 const EMPTY_FORM = {
   googleClientId: "",
@@ -16,6 +16,7 @@ function CredentialsPanel({ onClose }) {
   const [formData, setFormData] = useState(EMPTY_FORM);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [webhookUrl, setWebhookUrl] = useState("");
 
   useEffect(() => {
     const loadCredentials = async () => {
@@ -43,6 +44,19 @@ function CredentialsPanel({ onClose }) {
     };
 
     loadCredentials();
+  }, []);
+
+  useEffect(() => {
+    const loadWebhookUrl = async () => {
+      try {
+        const url = await fetchWebhookUrl();
+        setWebhookUrl(url);
+      } catch (error) {
+        console.error("Could not load webhook URL:", error);
+      }
+    };
+
+    loadWebhookUrl();
   }, []);
 
   const updateField = (field, value) => {
@@ -174,6 +188,25 @@ function CredentialsPanel({ onClose }) {
                 updateField("metaVerifyToken", event.target.value)
               }
             />
+
+            {webhookUrl && (
+              <>
+                <label className="form-label" style={{ marginTop: 12 }}>
+                  Webhook Callback URL
+                </label>
+                <input
+                  className="form-input"
+                  type="text"
+                  value={webhookUrl}
+                  readOnly
+                />
+                <p className="field-hint">
+                  Paste this URL in Meta Developer Console → WhatsApp →
+                  Configuration → Webhook. Use the same Verify Token above.
+                  Subscribe to the <strong>messages</strong> field.
+                </p>
+              </>
+            )}
 
             <hr className="form-divider" />
 

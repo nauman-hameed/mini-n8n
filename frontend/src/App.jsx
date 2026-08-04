@@ -11,7 +11,7 @@ import NotificationToast from "./components/NotificationToast";
 import WorkflowResultPanel from "./components/WorkflowResultPanel";
 
 import { createNode } from "./utils/nodeFactory";
-import { getBackendUrl } from "./utils/api";
+import { getBackendUrl, syncWorkflow } from "./utils/api";
 import { getWorkflowSteps } from "./utils/workflowSteps";
 
 const NODES_STORAGE_KEY = "mini-n8n-nodes";
@@ -66,6 +66,22 @@ function App() {
   useEffect(() => {
     localStorage.setItem(VIEW_STORAGE_KEY, view);
   }, [view]);
+
+  useEffect(() => {
+    if (view !== "editor" || nodes.length === 0) {
+      return undefined;
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        await syncWorkflow(nodes, edges);
+      } catch (error) {
+        console.error("Workflow sync failed:", error);
+      }
+    }, 1200);
+
+    return () => clearTimeout(timer);
+  }, [nodes, edges, view]);
 
   useEffect(() => {
     if (!isRunning || executionSteps.length === 0) {
@@ -164,6 +180,8 @@ function App() {
     });
 
     try {
+      await syncWorkflow(nodes, edges);
+
       const response = await fetch(getBackendUrl("/run-workflow"), {
         method: "POST",
         headers: {
@@ -193,13 +211,20 @@ function App() {
       });
 
       const sheetsUpdated = data.output?.google_sheets?.updated_rows > 0;
+      const whatsappSent = data.output?.whatsapp_send?.success;
+
+      let successMessage = data.message || "All nodes ran without errors.";
+
+      if (whatsappSent) {
+        successMessage = `WhatsApp confirmation sent to ${data.output.whatsapp_send.to}.`;
+      } else if (sheetsUpdated) {
+        successMessage = `Order saved to Google Sheets (${data.output.google_sheets.updated_rows} row added).`;
+      }
 
       pushNotification(
         "success",
         "Workflow executed successfully",
-        sheetsUpdated
-          ? `Order saved to Google Sheets (${data.output.google_sheets.updated_rows} row added).`
-          : data.message || "All nodes ran without errors."
+        successMessage
       );
     } catch (error) {
       console.error("Backend error:", error);

@@ -38,6 +38,28 @@ function WorkflowResultPanel({ result, executedNodes, onClose }) {
           </div>
         )}
 
+        {result?.whatsapp_send?.success && (
+          <div className="result-highlight result-highlight--success">
+            <strong>WhatsApp message sent</strong>
+            <p>
+              Delivered to {result.whatsapp_send.to}
+              {result.whatsapp_send.message_id
+                ? ` · ID: ${result.whatsapp_send.message_id}`
+                : ""}
+            </p>
+          </div>
+        )}
+
+        {result?.reply_message && !result?.whatsapp_send?.success && (
+          <div className="result-highlight">
+            <strong>Reply prepared only</strong>
+            <p>
+              Add a Test Phone on the WhatsApp Trigger node to send
+              during manual runs, or trigger via the Meta webhook.
+            </p>
+          </div>
+        )}
+
         <p className="form-label" style={{ marginTop: 16 }}>
           Extracted Order
         </p>

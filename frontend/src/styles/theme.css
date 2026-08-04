@@ -514,6 +514,22 @@ body {
   margin-bottom: 4px;
 }
 
+.result-highlight:not(.result-highlight--success) {
+  background: rgba(255, 109, 90, 0.1);
+  border: 1px solid rgba(255, 109, 90, 0.25);
+}
+
+.result-highlight:not(.result-highlight--success) strong {
+  color: var(--color-primary);
+}
+
+.field-hint {
+  margin-top: 6px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--color-text-dim);
+}
+
 .result-panel {
   max-height: 480px;
   z-index: 20;

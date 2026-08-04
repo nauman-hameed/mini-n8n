@@ -12,6 +12,7 @@ frontend/node_modules/
 
 # Credentials
 backend/storage/credentials.json
+backend/storage/workflow.json
 backend/tokens/
 backend/credentials/
 

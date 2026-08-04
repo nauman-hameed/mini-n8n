@@ -1,9 +1,17 @@
 from services.api_executor import execute_api_node
 from services.ai_extractor import execute_ai_extractor
 from services.google_sheets import append_order_to_sheet
+from services.whatsapp_service import (
+    render_reply_template,
+    send_whatsapp_text,
+)
 
 
-def run_workflow(nodes: list, edges: list):
+def run_workflow(
+    nodes: list,
+    edges: list,
+    trigger_context: dict | None = None,
+):
     node_map = {
         node["id"]: node
         for node in nodes
@@ -45,19 +53,39 @@ def run_workflow(nodes: list, edges: list):
             }
 
         elif node_type == "whatsappTrigger":
-            message = node_data.get(
-                "message",
-                "",
-            ).strip()
+            incoming_message = ""
+            from_phone = ""
 
-            if not message:
+            if trigger_context:
+                incoming_message = str(
+                    trigger_context.get("message", "")
+                ).strip()
+                from_phone = str(
+                    trigger_context.get("from_phone", "")
+                ).strip()
+            else:
+                from_phone = str(
+                    node_data.get("testPhone", "")
+                ).strip()
+
+            if not incoming_message:
+                incoming_message = node_data.get(
+                    "message",
+                    "",
+                ).strip()
+
+            if not incoming_message:
                 raise ValueError(
                     "WhatsApp Trigger message is missing."
                 )
 
             last_output = {
-                "message": message
+                "message": incoming_message,
+                "from_phone": from_phone,
             }
+
+            if from_phone and not trigger_context:
+                last_output["phone"] = from_phone
 
         elif node_type == "api":
             last_output = execute_api_node(
@@ -80,9 +108,22 @@ def run_workflow(nodes: list, edges: list):
                     "Incoming WhatsApp message is missing."
                 )
 
-            last_output = execute_ai_extractor(
+            from_phone = last_output.get(
+                "from_phone",
+                "",
+            )
+
+            extracted = execute_ai_extractor(
                 message
             )
+
+            last_output = {
+                **extracted,
+                "from_phone": from_phone,
+            }
+
+            if not last_output.get("phone") and from_phone:
+                last_output["phone"] = from_phone
 
         elif node_type == "googleSheets":
             if not last_output:
@@ -100,6 +141,11 @@ def run_workflow(nodes: list, edges: list):
                     "Google Sheets sheet name is missing."
                 )
 
+            preserved_phone = last_output.get(
+                "from_phone",
+                "",
+            )
+
             sheet_result = append_order_to_sheet(
                 order_data=last_output,
                 sheet_name=sheet_name,
@@ -107,6 +153,7 @@ def run_workflow(nodes: list, edges: list):
 
             last_output = {
                 **last_output,
+                "from_phone": preserved_phone,
                 "google_sheets": sheet_result,
             }
 
@@ -122,35 +169,42 @@ def run_workflow(nodes: list, edges: list):
                 "{{items}} has been received.",
             )
 
-            reply_message = (
-                reply_template
-                .replace(
-                    "{{name}}",
-                    str(
-                        last_output.get(
-                            "name",
-                            "",
-                        )
-                    ),
-                )
-                .replace(
-                    "{{items}}",
-                    str(
-                        last_output.get(
-                            "items",
-                            "",
-                        )
-                    ),
-                )
+            reply_message = render_reply_template(
+                reply_template,
+                last_output,
             )
+
+            recipient_phone = str(
+                last_output.get("from_phone", "")
+                or last_output.get("phone", "")
+            ).strip()
+
+            whatsapp_send = None
+
+            if recipient_phone:
+                whatsapp_send = send_whatsapp_text(
+                    to_phone=recipient_phone,
+                    message=reply_message,
+                    phone_number_id=(
+                        (trigger_context or {}).get(
+                            "phone_number_id"
+                        )
+                    ),
+                )
 
             last_output = {
                 **last_output,
                 "reply_message": reply_message,
+                "whatsapp_send": whatsapp_send,
             }
 
             return {
-                "message": "Workflow executed successfully.",
+                "message": (
+                    "Workflow executed successfully."
+                    if whatsapp_send
+                    else "Workflow executed. Reply prepared "
+                    "(not sent — no recipient phone)."
+                ),
                 "executed_nodes": executed_nodes,
                 "output": last_output,
             }
