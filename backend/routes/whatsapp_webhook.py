@@ -4,6 +4,7 @@ from fastapi.responses import (
     PlainTextResponse,
 )
 
+from config import META_VERIFY_TOKEN
 from services.workflow_runner import run_workflow
 from services.workflow_store import load_workflow
 from services.whatsapp_service import (
@@ -110,12 +111,11 @@ def verify_whatsapp_webhook(
         credentials = load_credentials()
         meta_credentials = get_meta_credentials()
 
-        verify_token = str(
-            credentials.get(
-                "metaVerifyToken",
-                "",
-            )
-        ).strip() or meta_credentials["verify_token"]
+        verify_token = (
+            str(credentials.get("metaVerifyToken", "")).strip()
+            or meta_credentials["verify_token"]
+            or str(META_VERIFY_TOKEN or "").strip()
+        )
 
         if not verify_token:
             return JSONResponse(
