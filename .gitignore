@@ -1,0 +1,22 @@
+# Python
+backend/venv/
+backend/__pycache__/
+backend/**/*.pyc
+
+# Environment
+backend/.env
+frontend/.env
+
+# Node
+frontend/node_modules/
+
+# Credentials
+backend/storage/credentials.json
+backend/tokens/
+backend/credentials/
+
+# macOS
+.DS_Store
+
+# Logs
+*.log

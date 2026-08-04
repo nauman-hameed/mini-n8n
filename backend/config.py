@@ -1,0 +1,28 @@
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+APP_ENV = os.getenv("APP_ENV")
+
+CREDENTIAL_ENCRYPTION_KEY = os.getenv(
+    "CREDENTIAL_ENCRYPTION_KEY"
+)
+
+FRONTEND_URL = os.getenv("FRONTEND_URL")
+BACKEND_URL = os.getenv("BACKEND_URL")
+
+ADMIN_PIN = os.getenv("ADMIN_PIN")
+
+AI_PROVIDER = os.getenv("AI_PROVIDER")
+OLLAMA_URL = os.getenv("OLLAMA_URL")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL")
+
+META_ACCESS_TOKEN = os.getenv("META_ACCESS_TOKEN")
+META_PHONE_NUMBER_ID = os.getenv("META_PHONE_NUMBER_ID")
+META_VERIFY_TOKEN = os.getenv("META_VERIFY_TOKEN")
+
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
+GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI")
+GOOGLE_SPREADSHEET_ID = os.getenv("GOOGLE_SPREADSHEET_ID")

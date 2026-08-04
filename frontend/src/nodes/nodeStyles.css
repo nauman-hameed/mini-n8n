@@ -1,0 +1,43 @@
+.config-node {
+  width: 220px;
+  text-align: left;
+}
+
+.config-node strong {
+  display: block;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.config-node label {
+  display: block;
+  margin-top: 8px;
+  margin-bottom: 4px;
+  font-size: 12px;
+}
+
+.config-node input,
+.config-node select {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 6px;
+}
+.config-node textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 65px;
+  padding: 6px;
+  resize: vertical;
+}
+.branch-label {
+  margin-top: 8px;
+  font-size: 11px;
+}
+
+.true-label {
+  color: green;
+}
+
+.false-label {
+  color: red;
+}
