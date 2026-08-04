@@ -13,12 +13,22 @@ from services.whatsapp_service import (
     send_whatsapp_text,
 )
 from services.credentials_service import load_credentials
+from services.execution_log import (
+    record_webhook_error,
+    record_webhook_start,
+    record_webhook_success,
+)
 
 
 router = APIRouter()
 
 
 def process_whatsapp_message(message_data: dict) -> None:
+    record_webhook_start(
+        message_data.get("from_phone", ""),
+        message_data.get("message", ""),
+    )
+
     try:
         workflow = load_workflow()
 
@@ -70,9 +80,12 @@ def process_whatsapp_message(message_data: dict) -> None:
         )
 
         print("WhatsApp workflow result:", result)
+        record_webhook_success()
 
     except Exception as error:
-        print("WhatsApp workflow error:", error)
+        error_message = str(error)
+        print("WhatsApp workflow error:", error_message)
+        record_webhook_error(error_message)
 
         try:
             send_whatsapp_text(

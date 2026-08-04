@@ -70,31 +70,45 @@ def main() -> int:
     print("Workflow synced.")
     print("Webhook URL:", workflow_data.get("webhook_url"))
 
-    try:
-        credentials = load_local_credentials()
-        print("Syncing credentials...")
-        credentials_response = requests.post(
-            f"{production_url}/credentials",
-            json=credentials,
+    credentials_file = STORAGE_DIR / "credentials.json"
+
+    if credentials_file.exists():
+        print("Syncing encrypted credentials blob...")
+        encrypted = credentials_file.read_text(encoding="utf-8").strip()
+        import_response = requests.post(
+            f"{production_url}/setup/import-encrypted-credentials",
+            json={"data": encrypted},
             timeout=30,
         )
-        credentials_data = credentials_response.json()
+        import_data = import_response.json()
 
-        if not credentials_response.ok:
-            print(
-                "Credentials sync failed:",
-                credentials_data.get("message"),
-            )
-            print(
-                "Ensure Railway has CREDENTIAL_ENCRYPTION_KEY="
-                "Ezv8xSACZVdpW3yCnhW9A4YO7rxH2a6h2Js3Aro7bFw="
-            )
-            return 1
-
-        print("Credentials synced.")
-    except Exception as error:
-        print("Credentials sync error:", error)
-        return 1
+        if import_response.ok:
+            print("Credentials imported.")
+        else:
+            print("Encrypted import failed:", import_data.get("message"))
+            print("Trying plain credentials POST...")
+            try:
+                credentials = load_local_credentials()
+                credentials_response = requests.post(
+                    f"{production_url}/credentials",
+                    json=credentials,
+                    timeout=30,
+                )
+                credentials_data = credentials_response.json()
+                if not credentials_response.ok:
+                    print(
+                        "Credentials sync failed:",
+                        credentials_data.get("message"),
+                    )
+                    print(
+                        "Set Railway env vars from: "
+                        "python scripts/export_railway_env.py"
+                    )
+                    return 1
+                print("Credentials synced.")
+            except Exception as error:
+                print("Credentials sync error:", error)
+                return 1
 
     print("\nMeta webhook setup:")
     print(f"  Callback URL: {production_url}/webhook/whatsapp")
