@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   ReactFlow,
@@ -8,9 +8,14 @@ import {
   Controls,
   ConnectionMode,
   Position,
+  BackgroundVariant,
 } from "@xyflow/react";
 
 import "@xyflow/react/dist/style.css";
+
+import N8nNode from "../nodes/N8nNode";
+
+const nodeTypes = { n8nNode: N8nNode };
 
 function Canvas({
   nodes,
@@ -19,8 +24,7 @@ function Canvas({
   edgesInApp,
   setEdgesInApp,
 }) {
-  const [selectedNodeId, setSelectedNodeId] =
-    useState(null);
+  const [selectedNodeId, setSelectedNodeId] = useState(null);
 
   const selectedNode = nodes.find(
     (node) => node.id === selectedNodeId
@@ -42,6 +46,7 @@ function Canvas({
           {
             ...connection,
             animated: true,
+            style: { stroke: "#ff6d5a", strokeWidth: 2 },
           },
           currentEdges
         )
@@ -59,7 +64,7 @@ function Canvas({
     [setEdgesInApp]
   );
 
-  const openNodeEditor = (event, node) => {
+  const openNodeEditor = (_event, node) => {
     if (
       node.data.nodeType === "start" ||
       node.data.nodeType === "stop"
@@ -86,24 +91,23 @@ function Canvas({
     );
   };
 
-  const preparedNodes = nodes.map((node) => ({
-    ...node,
-    sourcePosition: Position.Right,
-    targetPosition: Position.Left,
-  }));
+  const preparedNodes = useMemo(
+    () =>
+      nodes.map((node) => ({
+        ...node,
+        type: "n8nNode",
+        sourcePosition: Position.Right,
+        targetPosition: Position.Left,
+      })),
+    [nodes]
+  );
 
   return (
-    <div
-      style={{
-        flex: 1,
-        height: "100%",
-        position: "relative",
-        backgroundColor: "#1e1e1e",
-      }}
-    >
+    <div className="canvas-area">
       <ReactFlow
         nodes={preparedNodes}
         edges={edgesInApp}
+        nodeTypes={nodeTypes}
         onNodesChange={onNodesChange}
         onEdgesChange={handleEdgesChange}
         onConnect={onConnect}
@@ -112,330 +116,187 @@ function Canvas({
         proOptions={{ hideAttribution: true }}
         fitView
       >
-        <Background color="#444" gap={20} />
-        <Controls />
+        <Background
+          variant={BackgroundVariant.Dots}
+          color="#3a3a42"
+          gap={20}
+          size={1}
+        />
+        <Controls position="bottom-left" />
       </ReactFlow>
 
+      {nodes.length === 0 && (
+        <div className="canvas-empty">
+          <div className="canvas-empty-icon">+</div>
+          <p className="canvas-empty-title">Canvas is empty</p>
+          <p className="canvas-empty-desc">
+            Add nodes from the left panel and connect them to build your
+            workflow. Double-click a node to configure it.
+          </p>
+        </div>
+      )}
+
       {selectedNode && (
-        <div
-          style={{
-            position: "absolute",
-            top: "20px",
-            right: "20px",
-            width: "300px",
-            maxHeight: "calc(100% - 40px)",
-            overflowY: "auto",
-            backgroundColor: "white",
-            color: "#222",
-            padding: "18px",
-            borderRadius: "8px",
-            boxShadow: "0 4px 20px rgba(0,0,0,0.35)",
-            zIndex: 10,
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: "15px",
-            }}
-          >
-            <h3 style={{ margin: 0 }}>
+        <div className="panel node-editor-panel">
+          <div className="panel-header">
+            <h3 className="panel-title">
               {selectedNode.data.label} Settings
             </h3>
-
             <button
+              className="btn btn-icon btn-ghost"
               onClick={() => setSelectedNodeId(null)}
-              style={{
-                cursor: "pointer",
-                padding: "4px 8px",
-              }}
+              aria-label="Close settings"
             >
               ✕
             </button>
           </div>
 
-          {selectedNode.data.nodeType === "api" && (
-            <>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "5px",
-                }}
-              >
-                Method
-              </label>
+          <div className="panel-body">
+            {selectedNode.data.nodeType === "api" && (
+              <>
+                <label className="form-label">Method</label>
+                <select
+                  className="form-select"
+                  value={selectedNode.data.method || "GET"}
+                  onChange={(event) =>
+                    updateSelectedNode({
+                      method: event.target.value,
+                      label: `HTTP (${event.target.value})`,
+                    })
+                  }
+                >
+                  <option value="GET">GET</option>
+                  <option value="POST">POST</option>
+                </select>
 
-              <select
-                value={selectedNode.data.method || "GET"}
-                onChange={(event) =>
-                  updateSelectedNode({
-                    method: event.target.value,
-                    label: `API (${event.target.value})`,
-                  })
-                }
-                style={{
-                  boxSizing: "border-box",
-                  width: "100%",
-                  padding: "8px",
-                  marginBottom: "12px",
-                }}
-              >
-                <option value="GET">GET</option>
-                <option value="POST">POST</option>
-              </select>
+                <label className="form-label" style={{ marginTop: 12 }}>
+                  API URL
+                </label>
+                <input
+                  className="form-input"
+                  type="text"
+                  placeholder="https://api.example.com"
+                  value={selectedNode.data.apiUrl || ""}
+                  onChange={(event) =>
+                    updateSelectedNode({ apiUrl: event.target.value })
+                  }
+                />
+              </>
+            )}
 
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "5px",
-                }}
-              >
-                API URL
-              </label>
+            {selectedNode.data.nodeType === "llm" && (
+              <>
+                <label className="form-label">Prompt</label>
+                <textarea
+                  className="form-textarea"
+                  placeholder="Enter LLM prompt…"
+                  value={selectedNode.data.prompt || ""}
+                  onChange={(event) =>
+                    updateSelectedNode({
+                      prompt: event.target.value,
+                      label: "LLM Configured",
+                    })
+                  }
+                />
+              </>
+            )}
 
-              <input
-                type="text"
-                placeholder="https://api.example.com"
-                value={selectedNode.data.apiUrl || ""}
-                onChange={(event) =>
-                  updateSelectedNode({
-                    apiUrl: event.target.value,
-                  })
-                }
-                style={{
-                  boxSizing: "border-box",
-                  width: "100%",
-                  padding: "8px",
-                }}
-              />
-            </>
-          )}
+            {selectedNode.data.nodeType === "condition" && (
+              <>
+                <label className="form-label">Condition</label>
+                <input
+                  className="form-input"
+                  type="text"
+                  placeholder="status == 200"
+                  value={selectedNode.data.condition || ""}
+                  onChange={(event) =>
+                    updateSelectedNode({
+                      condition: event.target.value,
+                      label: "If / Else Configured",
+                    })
+                  }
+                />
+              </>
+            )}
 
-          {selectedNode.data.nodeType === "llm" && (
-            <>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "5px",
-                }}
-              >
-                Prompt
-              </label>
+            {selectedNode.data.nodeType === "whatsappTrigger" && (
+              <>
+                <label className="form-label">Sample WhatsApp Message</label>
+                <textarea
+                  className="form-textarea"
+                  placeholder="Ayesha Khan, 0300-1234567, House 4B, Street 3, DHA Phase 5, Karachi. Please send 2 Blue Kurtas."
+                  value={selectedNode.data.message || ""}
+                  onChange={(event) =>
+                    updateSelectedNode({ message: event.target.value })
+                  }
+                />
+              </>
+            )}
 
-              <textarea
-                placeholder="Enter LLM prompt..."
-                value={selectedNode.data.prompt || ""}
-                onChange={(event) =>
-                  updateSelectedNode({
-                    prompt: event.target.value,
-                    label: "LLM Configured",
-                  })
-                }
-                style={{
-                  boxSizing: "border-box",
-                  width: "100%",
-                  minHeight: "120px",
-                  padding: "8px",
-                  resize: "vertical",
-                }}
-              />
-            </>
-          )}
+            {selectedNode.data.nodeType === "aiExtractor" && (
+              <>
+                <label className="form-label">Extraction Prompt</label>
+                <textarea
+                  className="form-textarea"
+                  placeholder="Extract name, phone, address, and items. Return only JSON."
+                  value={selectedNode.data.prompt || ""}
+                  onChange={(event) =>
+                    updateSelectedNode({ prompt: event.target.value })
+                  }
+                />
+              </>
+            )}
 
-          {selectedNode.data.nodeType === "condition" && (
-            <>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "5px",
-                }}
-              >
-                Condition
-              </label>
+            {selectedNode.data.nodeType === "googleSheets" && (
+              <>
+                <label className="form-label">Sheet Name</label>
+                <input
+                  className="form-input"
+                  type="text"
+                  placeholder="Orders"
+                  value={selectedNode.data.sheetName || ""}
+                  onChange={(event) =>
+                    updateSelectedNode({ sheetName: event.target.value })
+                  }
+                />
 
-              <input
-                type="text"
-                placeholder="status == 200"
-                value={selectedNode.data.condition || ""}
-                onChange={(event) =>
-                  updateSelectedNode({
-                    condition: event.target.value,
-                    label: "If / Else Configured",
-                  })
-                }
-                style={{
-                  boxSizing: "border-box",
-                  width: "100%",
-                  padding: "8px",
-                }}
-              />
-            </>
-          )}
+                <label className="form-label" style={{ marginTop: 12 }}>
+                  Columns
+                </label>
+                <input
+                  className="form-input"
+                  type="text"
+                  placeholder="Name, Phone, Address, Items"
+                  value={selectedNode.data.columns || ""}
+                  onChange={(event) =>
+                    updateSelectedNode({ columns: event.target.value })
+                  }
+                />
+              </>
+            )}
 
-          {selectedNode.data.nodeType ===
-            "whatsappTrigger" && (
-            <>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "5px",
-                }}
-              >
-                Sample WhatsApp Message
-              </label>
+            {selectedNode.data.nodeType === "whatsappReply" && (
+              <>
+                <label className="form-label">Reply Message</label>
+                <textarea
+                  className="form-textarea"
+                  placeholder="Thank you {{name}}! Your order for {{items}} has been received."
+                  value={selectedNode.data.replyMessage || ""}
+                  onChange={(event) =>
+                    updateSelectedNode({ replyMessage: event.target.value })
+                  }
+                />
+              </>
+            )}
 
-              <textarea
-                placeholder="Ayesha Khan, 0300-1234567, House 4B, Street 3, DHA Phase 5, Karachi. Please send 2 Blue Kurtas."
-                value={selectedNode.data.message || ""}
-                onChange={(event) =>
-                  updateSelectedNode({
-                    message: event.target.value,
-                  })
-                }
-                style={{
-                  boxSizing: "border-box",
-                  width: "100%",
-                  minHeight: "140px",
-                  padding: "8px",
-                  resize: "vertical",
-                }}
-              />
-            </>
-          )}
-
-          {selectedNode.data.nodeType ===
-            "aiExtractor" && (
-            <>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "5px",
-                }}
-              >
-                Extraction Prompt
-              </label>
-
-              <textarea
-                placeholder="Extract name, phone, address, and items. Return only JSON."
-                value={selectedNode.data.prompt || ""}
-                onChange={(event) =>
-                  updateSelectedNode({
-                    prompt: event.target.value,
-                  })
-                }
-                style={{
-                  boxSizing: "border-box",
-                  width: "100%",
-                  minHeight: "140px",
-                  padding: "8px",
-                  resize: "vertical",
-                }}
-              />
-            </>
-          )}
-
-          {selectedNode.data.nodeType ===
-            "googleSheets" && (
-            <>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "5px",
-                }}
-              >
-                Sheet Name
-              </label>
-
-              <input
-                type="text"
-                placeholder="Orders"
-                value={selectedNode.data.sheetName || ""}
-                onChange={(event) =>
-                  updateSelectedNode({
-                    sheetName: event.target.value,
-                  })
-                }
-                style={{
-                  boxSizing: "border-box",
-                  width: "100%",
-                  padding: "8px",
-                  marginBottom: "12px",
-                }}
-              />
-
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "5px",
-                }}
-              >
-                Columns
-              </label>
-
-              <input
-                type="text"
-                placeholder="Name, Phone, Address, Items"
-                value={selectedNode.data.columns || ""}
-                onChange={(event) =>
-                  updateSelectedNode({
-                    columns: event.target.value,
-                  })
-                }
-                style={{
-                  boxSizing: "border-box",
-                  width: "100%",
-                  padding: "8px",
-                }}
-              />
-            </>
-          )}
-
-          {selectedNode.data.nodeType ===
-            "whatsappReply" && (
-            <>
-              <label
-                style={{
-                  display: "block",
-                  marginBottom: "5px",
-                }}
-              >
-                Reply Message
-              </label>
-
-              <textarea
-                placeholder="Thank you {{name}}! Your order for {{items}} has been received."
-                value={
-                  selectedNode.data.replyMessage || ""
-                }
-                onChange={(event) =>
-                  updateSelectedNode({
-                    replyMessage: event.target.value,
-                  })
-                }
-                style={{
-                  boxSizing: "border-box",
-                  width: "100%",
-                  minHeight: "130px",
-                  padding: "8px",
-                  resize: "vertical",
-                }}
-              />
-            </>
-          )}
-
-          <button
-            onClick={() => setSelectedNodeId(null)}
-            style={{
-              width: "100%",
-              marginTop: "16px",
-              padding: "9px",
-              cursor: "pointer",
-            }}
-          >
-            Done
-          </button>
+            <button
+              className="btn btn-primary"
+              style={{ width: "100%", marginTop: 16 }}
+              onClick={() => setSelectedNodeId(null)}
+            >
+              Done
+            </button>
+          </div>
         </div>
       )}
     </div>

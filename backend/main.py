@@ -41,12 +41,12 @@ app.include_router(whatsapp_webhook_router)
 allowed_origins = [
     "http://localhost:5173",
     "http://localhost:5174",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
+    "https://mini-n8n-gilt.vercel.app",
 ]
 
-if (
-    FRONTEND_URL
-    and FRONTEND_URL not in allowed_origins
-):
+if FRONTEND_URL and FRONTEND_URL not in allowed_origins:
     allowed_origins.append(FRONTEND_URL)
 
 

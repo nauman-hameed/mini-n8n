@@ -1,44 +1,75 @@
+import Logo from "./Logo";
+
 function Navbar({
   runWorkflow,
   stopWorkflow,
   openCredentials,
+  onGoHome,
+  executionState,
 }) {
+  const { status, message } = executionState;
+
+  const statusClass =
+    status === "running"
+      ? "navbar-status--running"
+      : status === "success"
+        ? "navbar-status--success"
+        : status === "error"
+          ? "navbar-status--error"
+          : "";
+
+  const statusLabel =
+    message ||
+    (status === "running"
+      ? "Executing…"
+      : status === "success"
+        ? "Completed"
+        : status === "error"
+          ? "Failed"
+          : "Ready");
+
   return (
-    <div
-      style={{
-        height: "60px",
-        backgroundColor: "#1f2937",
-        color: "white",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "0 20px",
-      }}
-    >
-      <h2 style={{ margin: 0 }}>
-        Mini n8n Workflow Builder
-      </h2>
+    <header className="navbar">
+      <div
+        className="navbar-brand"
+        onClick={onGoHome}
+        role="button"
+        tabIndex={0}
+      >
+        <Logo />
+        <div>
+          <div className="navbar-title">mini-n8n</div>
+          <div className="navbar-subtitle">Workflow Editor</div>
+        </div>
+      </div>
 
-      <div>
-        <button
-          onClick={openCredentials}
-          style={{ marginRight: "10px" }}
-        >
-          Credentials
+      <div className="navbar-actions">
+        <div className={`navbar-status ${statusClass}`}>
+          <span
+            className={`status-dot${
+              status === "running" ? " status-dot--running" : ""
+            }`}
+          />
+          {statusLabel}
+        </div>
+
+        <button className="btn btn-ghost" onClick={openCredentials}>
+          🔑 Credentials
         </button>
 
         <button
+          className="btn btn-execute"
           onClick={runWorkflow}
-          style={{ marginRight: "10px" }}
+          disabled={status === "running"}
         >
-          Run Workflow
+          {status === "running" ? "⏳ Running…" : "▶ Execute Workflow"}
         </button>
 
-        <button onClick={stopWorkflow}>
-          Stop Workflow
+        <button className="btn btn-ghost" onClick={stopWorkflow}>
+          Clear
         </button>
       </div>
-    </div>
+    </header>
   );
 }
 

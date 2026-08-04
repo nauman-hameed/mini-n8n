@@ -1,20 +1,26 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNodesState } from "@xyflow/react";
 
+import LandingPage from "./components/LandingPage";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import Canvas from "./components/Canvas";
 import CredentialsPanel from "./components/CredentialsPanel";
+import ExecutionOverlay from "./components/ExecutionOverlay";
+import NotificationToast from "./components/NotificationToast";
+import WorkflowResultPanel from "./components/WorkflowResultPanel";
 
 import { createNode } from "./utils/nodeFactory";
+import { getBackendUrl } from "./utils/api";
+import { getWorkflowSteps } from "./utils/workflowSteps";
 
 const NODES_STORAGE_KEY = "mini-n8n-nodes";
 const EDGES_STORAGE_KEY = "mini-n8n-edges";
+const VIEW_STORAGE_KEY = "mini-n8n-view";
 
 const getSavedData = (key) => {
   try {
     const savedData = localStorage.getItem(key);
-
     return savedData ? JSON.parse(savedData) : [];
   } catch (error) {
     console.error(`Could not load ${key}:`, error);
@@ -23,6 +29,10 @@ const getSavedData = (key) => {
 };
 
 function App() {
+  const [view, setView] = useState(
+    () => localStorage.getItem(VIEW_STORAGE_KEY) || "landing"
+  );
+
   const [nodes, setNodes, onNodesChange] = useNodesState(
     () => getSavedData(NODES_STORAGE_KEY)
   );
@@ -31,25 +41,79 @@ function App() {
     () => getSavedData(EDGES_STORAGE_KEY)
   );
 
-  const [workflowResult, setWorkflowResult] =
-    useState(null);
+  const [workflowResult, setWorkflowResult] = useState(null);
+  const [executedNodes, setExecutedNodes] = useState([]);
+  const [showCredentials, setShowCredentials] = useState(false);
+  const [isRunning, setIsRunning] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [executionSteps, setExecutionSteps] = useState([]);
+  const [executionState, setExecutionState] = useState({
+    status: "idle",
+    message: "",
+  });
+  const [notifications, setNotifications] = useState([]);
 
-  const [showCredentials, setShowCredentials] =
-    useState(false);
+  const notificationTimers = useRef({});
 
   useEffect(() => {
-    localStorage.setItem(
-      NODES_STORAGE_KEY,
-      JSON.stringify(nodes)
-    );
+    localStorage.setItem(NODES_STORAGE_KEY, JSON.stringify(nodes));
   }, [nodes]);
 
   useEffect(() => {
-    localStorage.setItem(
-      EDGES_STORAGE_KEY,
-      JSON.stringify(edges)
-    );
+    localStorage.setItem(EDGES_STORAGE_KEY, JSON.stringify(edges));
   }, [edges]);
+
+  useEffect(() => {
+    localStorage.setItem(VIEW_STORAGE_KEY, view);
+  }, [view]);
+
+  useEffect(() => {
+    if (!isRunning || executionSteps.length === 0) {
+      return undefined;
+    }
+
+    const timer = setInterval(() => {
+      setCurrentStep((step) =>
+        step < executionSteps.length - 1 ? step + 1 : step
+      );
+    }, 900);
+
+    return () => clearInterval(timer);
+  }, [isRunning, executionSteps]);
+
+  useEffect(() => {
+    return () => {
+      Object.values(notificationTimers.current).forEach(clearTimeout);
+    };
+  }, []);
+
+  const pushNotification = (type, title, message, autoDismissMs = 6000) => {
+    const id = `${Date.now()}-${Math.random()}`;
+
+    setNotifications((current) => [
+      ...current,
+      { id, type, title, message },
+    ]);
+
+    if (autoDismissMs > 0) {
+      notificationTimers.current[id] = setTimeout(() => {
+        dismissNotification(id);
+      }, autoDismissMs);
+    }
+
+    return id;
+  };
+
+  const dismissNotification = (id) => {
+    setNotifications((current) =>
+      current.filter((notification) => notification.id !== id)
+    );
+
+    clearTimeout(notificationTimers.current[id]);
+    delete notificationTimers.current[id];
+  };
+
+  const openEditor = () => setView("editor");
 
   const addNode = (nodeType) => {
     const nodeAlreadyExists = nodes.some(
@@ -57,182 +121,131 @@ function App() {
     );
 
     if (
-      (
-        nodeType === "start" ||
+      (nodeType === "start" ||
         nodeType === "stop" ||
-        nodeType === "whatsappTrigger"
-      ) &&
+        nodeType === "whatsappTrigger") &&
       nodeAlreadyExists
     ) {
       const messages = {
         start: "Start node already exists.",
         stop: "Stop node already exists.",
-        whatsappTrigger:
-          "WhatsApp Trigger node already exists.",
+        whatsappTrigger: "WhatsApp Trigger node already exists.",
       };
 
-      alert(messages[nodeType]);
+      pushNotification("warning", "Cannot add node", messages[nodeType]);
       return;
     }
 
     const newId = Date.now().toString();
     const newNode = createNode(nodeType, newId);
 
-    setNodes((currentNodes) => [
-      ...currentNodes,
-      newNode,
-    ]);
+    setNodes((currentNodes) => [...currentNodes, newNode]);
   };
 
   const runWorkflow = async () => {
-    const hasWhatsAppTrigger = nodes.some(
-      (node) =>
-        node.data.nodeType === "whatsappTrigger"
-    );
+    const validationError = validateWorkflow(nodes, edges);
 
-    if (!hasWhatsAppTrigger) {
-      alert("Please add a WhatsApp Trigger node.");
+    if (validationError) {
+      pushNotification("error", "Workflow not ready", validationError);
+      setExecutionState({ status: "error", message: "Validation failed" });
       return;
     }
 
-    if (edges.length === 0) {
-      alert("Please connect the nodes.");
-      return;
-    }
+    const steps = getWorkflowSteps(nodes, edges);
 
-    const unconfiguredApiNode = nodes.find(
-      (node) =>
-        node.data.nodeType === "api" &&
-        !node.data.apiUrl
-    );
-
-    if (unconfiguredApiNode) {
-      alert("Please configure the API node.");
-      return;
-    }
-
-    const unconfiguredLlmNode = nodes.find(
-      (node) =>
-        node.data.nodeType === "llm" &&
-        !node.data.prompt
-    );
-
-    if (unconfiguredLlmNode) {
-      alert("Please configure the LLM node.");
-      return;
-    }
-
-    const unconfiguredConditionNode = nodes.find(
-      (node) =>
-        node.data.nodeType === "condition" &&
-        !node.data.condition
-    );
-
-    if (unconfiguredConditionNode) {
-      alert("Please configure the If / Else node.");
-      return;
-    }
-
-    const unconfiguredWhatsAppTrigger = nodes.find(
-      (node) =>
-        node.data.nodeType === "whatsappTrigger" &&
-        !node.data.message
-    );
-
-    if (unconfiguredWhatsAppTrigger) {
-      alert("Please configure the WhatsApp Trigger node.");
-      return;
-    }
-
-    const unconfiguredAiExtractor = nodes.find(
-      (node) =>
-        node.data.nodeType === "aiExtractor" &&
-        !node.data.prompt
-    );
-
-    if (unconfiguredAiExtractor) {
-      alert("Please configure the AI Order Extractor node.");
-      return;
-    }
-
-    const unconfiguredGoogleSheets = nodes.find(
-      (node) =>
-        node.data.nodeType === "googleSheets" &&
-        (
-          !node.data.sheetName ||
-          !node.data.columns
-        )
-    );
-
-    if (unconfiguredGoogleSheets) {
-      alert("Please configure the Google Sheets node.");
-      return;
-    }
-
-    const unconfiguredWhatsAppReply = nodes.find(
-      (node) =>
-        node.data.nodeType === "whatsappReply" &&
-        !node.data.replyMessage
-    );
-
-    if (unconfiguredWhatsAppReply) {
-      alert("Please configure the WhatsApp Reply node.");
-      return;
-    }
+    setWorkflowResult(null);
+    setExecutedNodes([]);
+    setIsRunning(true);
+    setCurrentStep(0);
+    setExecutionSteps(steps);
+    setExecutionState({
+      status: "running",
+      message: "Executing workflow…",
+    });
 
     try {
-      setWorkflowResult(null);
-
-      const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/run-workflow`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            nodes,
-            edges,
-          }),
-        }
-      );
+      const response = await fetch(getBackendUrl("/run-workflow"), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ nodes, edges }),
+      });
 
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.message || "Workflow failed.");
+        setExecutionState({ status: "error", message: "Execution failed" });
+        pushNotification(
+          "error",
+          "Workflow failed",
+          data.message || "Something went wrong while running the workflow.",
+          0
+        );
         return;
       }
 
       setWorkflowResult(data.output);
+      setExecutedNodes(data.executed_nodes || []);
+      setExecutionState({
+        status: "success",
+        message: "Completed successfully",
+      });
+
+      const sheetsUpdated = data.output?.google_sheets?.updated_rows > 0;
+
+      pushNotification(
+        "success",
+        "Workflow executed successfully",
+        sheetsUpdated
+          ? `Order saved to Google Sheets (${data.output.google_sheets.updated_rows} row added).`
+          : data.message || "All nodes ran without errors."
+      );
     } catch (error) {
       console.error("Backend error:", error);
-      alert("Backend connection failed.");
+      setExecutionState({ status: "error", message: "Connection failed" });
+      pushNotification(
+        "error",
+        "Backend connection failed",
+        `Could not reach the server at ${getBackendUrl()}.`,
+        0
+      );
+    } finally {
+      setIsRunning(false);
+      setCurrentStep(steps.length);
     }
   };
 
   const stopWorkflow = () => {
     setWorkflowResult(null);
-    alert("Workflow stopped.");
+    setExecutedNodes([]);
+    setIsRunning(false);
+    setCurrentStep(0);
+    setExecutionSteps([]);
+    setExecutionState({ status: "idle", message: "" });
+    setNotifications([]);
   };
+
+  if (view === "landing") {
+    return <LandingPage onOpenEditor={openEditor} />;
+  }
 
   return (
     <>
       <Navbar
         runWorkflow={runWorkflow}
         stopWorkflow={stopWorkflow}
-        openCredentials={() =>
-          setShowCredentials(true)
-        }
+        openCredentials={() => setShowCredentials(true)}
+        onGoHome={() => setView("landing")}
+        executionState={executionState}
       />
 
-      <div
-        style={{
-          display: "flex",
-          width: "100%",
-          height: "calc(100vh - 60px)",
-        }}
-      >
+      <NotificationToast
+        notifications={notifications}
+        onDismiss={dismissNotification}
+      />
+
+      <div className="app-layout">
         <Sidebar addNode={addNode} />
 
         <Canvas
@@ -244,89 +257,85 @@ function App() {
         />
       </div>
 
-      {showCredentials && (
-        <CredentialsPanel
-          onClose={() =>
-            setShowCredentials(false)
-          }
+      {isRunning && (
+        <ExecutionOverlay
+          executedSteps={executionSteps}
+          currentStep={currentStep}
         />
       )}
 
-      {workflowResult && (
-        <div
-          style={{
-            position: "fixed",
-            right: "20px",
-            bottom: "20px",
-            width: "340px",
-            backgroundColor: "white",
-            color: "#222",
-            padding: "18px",
-            borderRadius: "8px",
-            boxShadow:
-              "0 4px 20px rgba(0,0,0,0.35)",
-            zIndex: 20,
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: "12px",
-            }}
-          >
-            <h3 style={{ margin: 0 }}>
-              Workflow Result
-            </h3>
+      {showCredentials && (
+        <CredentialsPanel onClose={() => setShowCredentials(false)} />
+      )}
 
-            <button
-              onClick={() =>
-                setWorkflowResult(null)
-              }
-              style={{
-                cursor: "pointer",
-                padding: "4px 8px",
-              }}
-            >
-              ✕
-            </button>
-          </div>
-
-          <p>
-            <strong>Name:</strong>{" "}
-            {workflowResult.name || "-"}
-          </p>
-
-          <p>
-            <strong>Phone:</strong>{" "}
-            {workflowResult.phone || "-"}
-          </p>
-
-          <p>
-            <strong>Address:</strong>{" "}
-            {workflowResult.address || "-"}
-          </p>
-
-          <p>
-            <strong>Items:</strong>{" "}
-            {workflowResult.items || "-"}
-          </p>
-
-          <hr style={{ margin: "12px 0" }} />
-
-          <p>
-            <strong>WhatsApp Reply:</strong>
-          </p>
-
-          <p>
-            {workflowResult.reply_message ||
-              "No reply generated."}
-          </p>
-        </div>
+      {workflowResult && !isRunning && (
+        <WorkflowResultPanel
+          result={workflowResult}
+          executedNodes={executedNodes}
+          onClose={() => setWorkflowResult(null)}
+        />
       )}
     </>
   );
+}
+
+function validateWorkflow(nodes, edges) {
+  const hasWhatsAppTrigger = nodes.some(
+    (node) => node.data.nodeType === "whatsappTrigger"
+  );
+
+  if (!hasWhatsAppTrigger) {
+    return "Please add a WhatsApp Trigger node.";
+  }
+
+  if (edges.length === 0) {
+    return "Please connect the nodes.";
+  }
+
+  const checks = [
+    {
+      find: (node) => node.data.nodeType === "api" && !node.data.apiUrl,
+      message: "Please configure the API node.",
+    },
+    {
+      find: (node) => node.data.nodeType === "llm" && !node.data.prompt,
+      message: "Please configure the LLM node.",
+    },
+    {
+      find: (node) =>
+        node.data.nodeType === "condition" && !node.data.condition,
+      message: "Please configure the If / Else node.",
+    },
+    {
+      find: (node) =>
+        node.data.nodeType === "whatsappTrigger" && !node.data.message,
+      message: "Please configure the WhatsApp Trigger node.",
+    },
+    {
+      find: (node) =>
+        node.data.nodeType === "aiExtractor" && !node.data.prompt,
+      message: "Please configure the AI Order Extractor node.",
+    },
+    {
+      find: (node) =>
+        node.data.nodeType === "googleSheets" &&
+        (!node.data.sheetName || !node.data.columns),
+      message: "Please configure the Google Sheets node.",
+    },
+    {
+      find: (node) =>
+        node.data.nodeType === "whatsappReply" && !node.data.replyMessage,
+      message: "Please configure the WhatsApp Reply node.",
+    },
+  ];
+
+  for (const check of checks) {
+    if (nodes.find(check.find)) {
+      return check.message;
+    }
+  }
+
+  return null;
 }
 
 export default App;

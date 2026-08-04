@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getBackendUrl } from "../utils/api";
 
 const EMPTY_FORM = {
   googleClientId: "",
@@ -12,29 +13,19 @@ const EMPTY_FORM = {
 };
 
 function CredentialsPanel({ onClose }) {
-  const [formData, setFormData] =
-    useState(EMPTY_FORM);
-
-  const [isLoading, setIsLoading] =
-    useState(true);
-
-  const [isSaving, setIsSaving] =
-    useState(false);
+  const [formData, setFormData] = useState(EMPTY_FORM);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     const loadCredentials = async () => {
       try {
-        const response = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/credentials`
-        );
+        const response = await fetch(getBackendUrl("/credentials"));
 
         const data = await response.json();
 
         if (!response.ok) {
-          console.error(
-            data.message ||
-              "Could not load credentials."
-          );
+          console.error(data.message || "Could not load credentials.");
           return;
         }
 
@@ -45,10 +36,7 @@ function CredentialsPanel({ onClose }) {
           });
         }
       } catch (error) {
-        console.error(
-          "Could not load credentials:",
-          error
-        );
+        console.error("Could not load credentials:", error);
       } finally {
         setIsLoading(false);
       }
@@ -70,275 +58,162 @@ function CredentialsPanel({ onClose }) {
     try {
       setIsSaving(true);
 
-      const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/credentials`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+      const response = await fetch(getBackendUrl("/credentials"), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
       const data = await response.json();
 
       if (!response.ok) {
-        alert(
-          data.message ||
-            "Could not save credentials."
-        );
+        alert(data.message || "Could not save credentials.");
         return;
       }
 
       alert(data.message);
       onClose();
     } catch (error) {
-      console.error(
-        "Credentials error:",
-        error
-      );
-
+      console.error("Credentials error:", error);
       alert("Backend connection failed.");
     } finally {
       setIsSaving(false);
     }
   };
 
-  const inputStyle = {
-    boxSizing: "border-box",
-    width: "100%",
-    padding: "9px",
-    marginTop: "5px",
-    marginBottom: "12px",
-  };
-
-  const labelStyle = {
-    display: "block",
-    fontWeight: "600",
-  };
-
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        backgroundColor: "rgba(0,0,0,0.55)",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        zIndex: 100,
-      }}
-    >
+    <div className="modal-overlay" onClick={onClose}>
       <div
-        style={{
-          width: "480px",
-          maxHeight: "85vh",
-          overflowY: "auto",
-          background: "white",
-          borderRadius: "8px",
-          padding: "20px",
-          color: "#222",
-        }}
+        className="modal"
+        onClick={(event) => event.stopPropagation()}
+        role="dialog"
+        aria-labelledby="credentials-title"
       >
-        <div
-          style={{
-            display: "flex",
-            justifyContent:
-              "space-between",
-            alignItems: "center",
-            marginBottom: "18px",
-          }}
-        >
-          <h2 style={{ margin: 0 }}>
-            Credentials
+        <div className="modal-header">
+          <h2 className="modal-title" id="credentials-title">
+            🔑 Credentials
           </h2>
-
           <button
+            className="btn btn-icon btn-ghost"
             onClick={onClose}
             disabled={isSaving}
+            aria-label="Close"
           >
             ✕
           </button>
         </div>
 
         {isLoading ? (
-          <p>Loading credentials...</p>
+          <p className="modal-loading">Loading credentials…</p>
         ) : (
-          <form onSubmit={handleSubmit}>
-            <h3>Google Sheets</h3>
+          <form className="modal-body" onSubmit={handleSubmit}>
+            <h3 className="form-section-title">Google Sheets</h3>
 
-            <label style={labelStyle}>
-              Google Client ID
-            </label>
-
+            <label className="form-label">Google Client ID</label>
             <input
+              className="form-input"
               type="text"
               value={formData.googleClientId}
               onChange={(event) =>
-                updateField(
-                  "googleClientId",
-                  event.target.value
-                )
+                updateField("googleClientId", event.target.value)
               }
-              style={inputStyle}
             />
 
-            <label style={labelStyle}>
-              Google Client Secret
-            </label>
-
+            <label className="form-label">Google Client Secret</label>
             <input
+              className="form-input"
               type="password"
-              value={
-                formData.googleClientSecret
-              }
+              value={formData.googleClientSecret}
               onChange={(event) =>
-                updateField(
-                  "googleClientSecret",
-                  event.target.value
-                )
+                updateField("googleClientSecret", event.target.value)
               }
-              style={inputStyle}
             />
 
-            <label style={labelStyle}>
-              Spreadsheet ID
-            </label>
-
+            <label className="form-label">Spreadsheet ID</label>
             <input
+              className="form-input"
               type="text"
-              value={
-                formData.googleSpreadsheetId
-              }
+              value={formData.googleSpreadsheetId}
               onChange={(event) =>
-                updateField(
-                  "googleSpreadsheetId",
-                  event.target.value
-                )
+                updateField("googleSpreadsheetId", event.target.value)
               }
-              style={inputStyle}
             />
 
-            <hr />
+            <hr className="form-divider" />
 
-            <h3>Meta WhatsApp</h3>
+            <h3 className="form-section-title">Meta WhatsApp</h3>
 
-            <label style={labelStyle}>
-              Access Token
-            </label>
-
+            <label className="form-label">Access Token</label>
             <input
+              className="form-input"
               type="password"
               value={formData.metaAccessToken}
               onChange={(event) =>
-                updateField(
-                  "metaAccessToken",
-                  event.target.value
-                )
+                updateField("metaAccessToken", event.target.value)
               }
-              style={inputStyle}
             />
 
-            <label style={labelStyle}>
-              Phone Number ID
-            </label>
-
+            <label className="form-label">Phone Number ID</label>
             <input
+              className="form-input"
               type="text"
-              value={
-                formData.metaPhoneNumberId
-              }
+              value={formData.metaPhoneNumberId}
               onChange={(event) =>
-                updateField(
-                  "metaPhoneNumberId",
-                  event.target.value
-                )
+                updateField("metaPhoneNumberId", event.target.value)
               }
-              style={inputStyle}
             />
 
-            <label style={labelStyle}>
-              Verify Token
-            </label>
-
+            <label className="form-label">Verify Token</label>
             <input
+              className="form-input"
               type="password"
               value={formData.metaVerifyToken}
               onChange={(event) =>
-                updateField(
-                  "metaVerifyToken",
-                  event.target.value
-                )
+                updateField("metaVerifyToken", event.target.value)
               }
-              style={inputStyle}
             />
 
-            <hr />
+            <hr className="form-divider" />
 
-            <h3>AI Provider</h3>
+            <h3 className="form-section-title">AI Provider</h3>
 
-            <label style={labelStyle}>
-              Provider
-            </label>
-
+            <label className="form-label">Provider</label>
             <select
+              className="form-select"
               value={formData.aiProvider}
               onChange={(event) =>
-                updateField(
-                  "aiProvider",
-                  event.target.value
-                )
+                updateField("aiProvider", event.target.value)
               }
-              style={inputStyle}
             >
-              <option value="ollama">
-                Ollama
-              </option>
-
-              <option value="gemini">
-                Gemini
-              </option>
+              <option value="ollama">Ollama</option>
+              <option value="gemini">Gemini</option>
             </select>
 
-            {formData.aiProvider ===
-              "gemini" && (
+            {formData.aiProvider === "gemini" && (
               <>
-                <label style={labelStyle}>
+                <label className="form-label" style={{ marginTop: 12 }}>
                   Gemini API Key
                 </label>
-
                 <input
+                  className="form-input"
                   type="password"
-                  value={
-                    formData.geminiApiKey
-                  }
+                  value={formData.geminiApiKey}
                   onChange={(event) =>
-                    updateField(
-                      "geminiApiKey",
-                      event.target.value
-                    )
+                    updateField("geminiApiKey", event.target.value)
                   }
-                  style={inputStyle}
                 />
               </>
             )}
 
             <button
               type="submit"
+              className="btn btn-primary"
               disabled={isSaving}
-              style={{
-                width: "100%",
-                padding: "10px",
-                marginTop: "10px",
-                cursor: isSaving
-                  ? "not-allowed"
-                  : "pointer",
-              }}
+              style={{ width: "100%", marginTop: 20 }}
             >
-              {isSaving
-                ? "Saving..."
-                : "Save Credentials"}
+              {isSaving ? "Saving…" : "Save Credentials"}
             </button>
           </form>
         )}

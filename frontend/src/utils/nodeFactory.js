@@ -14,7 +14,7 @@ export function createNode(nodeType, id) {
 
   return {
     id: id.toString(),
-    type: "default",
+    type: "n8nNode",
 
     position: {
       x: 200 + Math.random() * 300,
