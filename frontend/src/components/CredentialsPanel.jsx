@@ -14,49 +14,16 @@ const EMPTY_FORM = {
 
 function CredentialsPanel({ onClose }) {
   const [formData, setFormData] = useState(EMPTY_FORM);
-  const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
   const [webhookUrl, setWebhookUrl] = useState("");
 
-  const loadCredentials = async () => {
-    try {
-      const response = await fetch(getBackendUrl("/credentials"));
-      const data = await response.json();
-
-      if (!response.ok) {
-        console.error(data.message || "Could not load credentials.");
-        return;
-      }
-
-      if (data.credentials && Object.keys(data.credentials).length > 0) {
-        setFormData({
-          ...EMPTY_FORM,
-          ...data.credentials,
-        });
-      }
-    } catch (error) {
-      console.error("Could not load credentials:", error);
-    }
-  };
-
   useEffect(() => {
-    const loadPanelData = async () => {
-      setIsLoading(true);
-
-      await Promise.all([
-        loadCredentials(),
-        fetchWebhookUrl()
-          .then(setWebhookUrl)
-          .catch((error) => {
-            console.error("Could not load webhook URL:", error);
-          }),
-      ]);
-
-      setIsLoading(false);
-    };
-
-    loadPanelData();
+    fetchWebhookUrl()
+      .then(setWebhookUrl)
+      .catch((error) => {
+        console.error("Could not load webhook URL:", error);
+      });
   }, []);
 
   const updateField = (field, value) => {
@@ -89,7 +56,6 @@ function CredentialsPanel({ onClose }) {
       }
 
       setSaveMessage("Credentials saved securely.");
-      await loadCredentials();
     } catch (error) {
       console.error("Credentials error:", error);
       alert("Backend connection failed.");
@@ -120,14 +86,11 @@ function CredentialsPanel({ onClose }) {
           </button>
         </div>
 
-        {isLoading ? (
-          <p className="modal-loading">Loading credentials…</p>
-        ) : (
-          <form className="modal-body" onSubmit={handleSubmit}>
-            <p className="field-hint" style={{ marginBottom: 16 }}>
-              Fill in your API keys below, then click Save Credentials.
-              Saved values reload when you reopen this panel.
-            </p>
+        <form className="modal-body" onSubmit={handleSubmit}>
+          <p className="field-hint" style={{ marginBottom: 16 }}>
+            Paste your API keys below, then click Save Credentials. Fields
+            start empty each time you open this panel.
+          </p>
 
             {saveMessage && (
               <p
@@ -264,7 +227,6 @@ function CredentialsPanel({ onClose }) {
             {isSaving ? "Saving…" : "Save Credentials"}
           </button>
         </form>
-        )}
       </div>
     </div>
   );
