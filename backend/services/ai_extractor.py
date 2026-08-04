@@ -2,7 +2,7 @@ import json
 
 import requests
 
-from config import AI_PROVIDER, GEMINI_API_KEY, OLLAMA_MODEL, OLLAMA_URL
+from config import AI_PROVIDER, GEMINI_API_KEY, GEMINI_MODEL, OLLAMA_MODEL, OLLAMA_URL
 from services.credentials_service import load_credentials
 
 EXTRACTION_SCHEMA = {
@@ -130,7 +130,7 @@ def extract_with_gemini(message: str) -> dict:
 
     url = (
         "https://generativelanguage.googleapis.com/"
-        "v1beta/models/gemini-1.5-flash:generateContent"
+        f"v1beta/models/{GEMINI_MODEL}:generateContent"
     )
 
     payload = {
