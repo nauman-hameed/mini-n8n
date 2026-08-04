@@ -3,6 +3,21 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 WORKFLOW_FILE = BASE_DIR / "storage" / "workflow.json"
+DEFAULT_WORKFLOW_FILE = BASE_DIR / "data" / "default_workflow.json"
+
+
+def _seed_default_workflow_if_needed() -> None:
+    if WORKFLOW_FILE.exists():
+        return
+
+    if not DEFAULT_WORKFLOW_FILE.exists():
+        return
+
+    WORKFLOW_FILE.parent.mkdir(parents=True, exist_ok=True)
+    WORKFLOW_FILE.write_text(
+        DEFAULT_WORKFLOW_FILE.read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
 
 
 def save_workflow(workflow: dict) -> None:
@@ -23,6 +38,8 @@ def save_workflow(workflow: dict) -> None:
 
 
 def load_workflow() -> dict | None:
+    _seed_default_workflow_if_needed()
+
     if not WORKFLOW_FILE.exists():
         return None
 

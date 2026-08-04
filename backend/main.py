@@ -9,6 +9,7 @@ from config import (
 )
 
 from services.workflow_runner import run_workflow
+from services.workflow_store import _seed_default_workflow_if_needed
 
 from routes.google_auth import (
     router as google_auth_router,
@@ -29,6 +30,11 @@ print("OLLAMA_MODEL:", OLLAMA_MODEL)
 
 
 app = FastAPI()
+
+
+@app.on_event("startup")
+def seed_default_workflow() -> None:
+    _seed_default_workflow_if_needed()
 
 
 # Google OAuth routes

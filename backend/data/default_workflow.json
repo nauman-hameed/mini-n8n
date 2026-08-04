@@ -1,0 +1,113 @@
+{
+  "nodes": [
+    {
+      "id": "1785864897195",
+      "type": "default",
+      "position": {
+        "x": -279.62647837569716,
+        "y": -193.3498185918368
+      },
+      "data": {
+        "label": "WhatsApp Trigger",
+        "nodeType": "whatsappTrigger",
+        "testPhone": "923071055454",
+        "message": ""
+      },
+      "measured": {
+        "width": 193,
+        "height": 60
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "1785866449354",
+      "type": "n8nNode",
+      "position": {
+        "x": -13.53670190211362,
+        "y": -192.6136307870018
+      },
+      "data": {
+        "label": "AI Order Extractor",
+        "nodeType": "aiExtractor",
+        "prompt": "Extract customer order information from the WhatsApp message below.\n\nReturn ONLY valid JSON with exactly these keys:\n- name\n- phone\n- address\n- items\n\nRules:\n- All values must be strings.\n- Keep the phone number exactly as written in the message.\n- Combine multiple products into one readable items string (e.g. \"2 Blue Shirts, 1 Black Shoes Size 42\").\n- Do not invent missing information.\n- If a field is missing, use an empty string \"\".\n- Do not include explanations or markdown."
+      },
+      "measured": {
+        "width": 191,
+        "height": 60
+      },
+      "selected": false,
+      "dragging": false
+    },
+    {
+      "id": "1785866567055",
+      "type": "n8nNode",
+      "position": {
+        "x": 273.825693493743,
+        "y": 165.7512615454848
+      },
+      "data": {
+        "label": "Google Sheets",
+        "nodeType": "googleSheets",
+        "sheetName": "Orders",
+        "columns": "Name, Phone, Address, Items"
+      },
+      "measured": {
+        "width": 180,
+        "height": 60
+      },
+      "selected": false
+    },
+    {
+      "id": "1785866571572",
+      "type": "n8nNode",
+      "position": {
+        "x": 519.7565955463401,
+        "y": 164.0489807904347
+      },
+      "data": {
+        "label": "WhatsApp Reply",
+        "nodeType": "whatsappReply",
+        "replyMessage": "Hi Ali Khan \ud83d\udc4b\n\nYour order has been received successfully.\n\nItems:\n2 Blue Shirts\n..."
+      },
+      "measured": {
+        "width": 183,
+        "height": 60
+      },
+      "selected": false,
+      "dragging": false
+    }
+  ],
+  "edges": [
+    {
+      "source": "1785864897195",
+      "target": "1785866449354",
+      "animated": true,
+      "style": {
+        "stroke": "#ff6d5a",
+        "strokeWidth": 2
+      },
+      "id": "xy-edge__1785864897195-1785866449354"
+    },
+    {
+      "source": "1785866449354",
+      "target": "1785866567055",
+      "animated": true,
+      "style": {
+        "stroke": "#ff6d5a",
+        "strokeWidth": 2
+      },
+      "id": "xy-edge__1785866449354-1785866567055"
+    },
+    {
+      "source": "1785866567055",
+      "target": "1785866571572",
+      "animated": true,
+      "style": {
+        "stroke": "#ff6d5a",
+        "strokeWidth": 2
+      },
+      "id": "xy-edge__1785866567055-1785866571572"
+    }
+  ]
+}
