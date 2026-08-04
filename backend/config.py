@@ -31,6 +31,12 @@ AI_PROVIDER = _clean_env(os.getenv("AI_PROVIDER")) or (
     if os.getenv("RAILWAY_PUBLIC_DOMAIN")
     else None
 )
+
+if (
+    os.getenv("RAILWAY_PUBLIC_DOMAIN")
+    and AI_PROVIDER == "ollama"
+):
+    AI_PROVIDER = "gemini"
 OLLAMA_URL = os.getenv("OLLAMA_URL")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
