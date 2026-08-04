@@ -6,6 +6,7 @@ from config import (
     META_ACCESS_TOKEN,
     META_API_VERSION,
     META_PHONE_NUMBER_ID,
+    META_VERIFY_TOKEN,
 )
 from services.credentials_service import load_credentials
 
@@ -23,7 +24,7 @@ def get_meta_credentials() -> dict:
 
     verify_token = str(
         stored.get("metaVerifyToken", "")
-    ).strip()
+    ).strip() or str(META_VERIFY_TOKEN or "").strip()
 
     return {
         "access_token": access_token,
