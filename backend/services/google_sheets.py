@@ -4,7 +4,7 @@ from pathlib import Path
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 
-from config import GOOGLE_SPREADSHEET_ID
+from config import GOOGLE_SPREADSHEET_ID, GOOGLE_TOKEN_JSON
 from services.credentials_service import load_credentials
 
 
@@ -24,7 +24,10 @@ def _load_google_credentials() -> Credentials:
         )
 
     saved_credentials = load_credentials()
-    token_json = saved_credentials.get("googleTokenJson")
+    token_json = (
+        saved_credentials.get("googleTokenJson")
+        or GOOGLE_TOKEN_JSON
+    )
 
     if not token_json:
         raise ValueError(
