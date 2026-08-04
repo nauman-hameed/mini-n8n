@@ -25,7 +25,11 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 META_ACCESS_TOKEN = os.getenv("META_ACCESS_TOKEN")
 META_PHONE_NUMBER_ID = os.getenv("META_PHONE_NUMBER_ID")
-META_VERIFY_TOKEN = os.getenv("META_VERIFY_TOKEN")
+META_VERIFY_TOKEN = os.getenv("META_VERIFY_TOKEN") or (
+    "mini_n8n_verify_token"
+    if os.getenv("RAILWAY_PUBLIC_DOMAIN")
+    else ""
+)
 META_API_VERSION = os.getenv("META_API_VERSION", "v23.0")
 
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
