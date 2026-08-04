@@ -2,10 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { useNodesState } from "@xyflow/react";
 
 import LandingPage from "./components/LandingPage";
-import EditorPinGate, {
-  isEditorUnlocked,
-  lockEditor,
-} from "./components/EditorPinGate";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import Canvas from "./components/Canvas";
@@ -33,7 +29,6 @@ const getSavedData = (key) => {
 
 function App() {
   const [view, setView] = useState("landing");
-  const [showPinGate, setShowPinGate] = useState(false);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(
     () => getSavedData(NODES_STORAGE_KEY)
@@ -127,24 +122,7 @@ function App() {
     delete notificationTimers.current[id];
   };
 
-  const openEditor = () => {
-    if (isEditorUnlocked()) {
-      setView("editor");
-      return;
-    }
-
-    setShowPinGate(true);
-  };
-
-  const handleEditorUnlocked = () => {
-    setShowPinGate(false);
-    setView("editor");
-  };
-
-  const goHome = () => {
-    lockEditor();
-    setView("landing");
-  };
+  const openEditor = () => setView("editor");
 
   const addNode = (nodeType) => {
     const nodeAlreadyExists = nodes.some(
@@ -267,17 +245,7 @@ function App() {
   };
 
   if (view === "landing") {
-    return (
-      <>
-        <LandingPage onOpenEditor={openEditor} />
-        {showPinGate && (
-          <EditorPinGate
-            onClose={() => setShowPinGate(false)}
-            onSuccess={handleEditorUnlocked}
-          />
-        )}
-      </>
-    );
+    return <LandingPage onOpenEditor={openEditor} />;
   }
 
   return (
@@ -286,7 +254,7 @@ function App() {
         runWorkflow={runWorkflow}
         stopWorkflow={stopWorkflow}
         openCredentials={() => setShowCredentials(true)}
-        onGoHome={goHome}
+        onGoHome={() => setView("landing")}
         executionState={executionState}
       />
 
