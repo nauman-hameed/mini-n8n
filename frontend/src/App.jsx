@@ -2,6 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { useNodesState } from "@xyflow/react";
 
 import LandingPage from "./components/LandingPage";
+import EditorPinGate, {
+  isEditorUnlocked,
+  lockEditor,
+} from "./components/EditorPinGate";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import Canvas from "./components/Canvas";
@@ -16,7 +20,6 @@ import { getWorkflowSteps } from "./utils/workflowSteps";
 
 const NODES_STORAGE_KEY = "mini-n8n-nodes";
 const EDGES_STORAGE_KEY = "mini-n8n-edges";
-const VIEW_STORAGE_KEY = "mini-n8n-view";
 
 const getSavedData = (key) => {
   try {
@@ -29,9 +32,8 @@ const getSavedData = (key) => {
 };
 
 function App() {
-  const [view, setView] = useState(
-    () => localStorage.getItem(VIEW_STORAGE_KEY) || "landing"
-  );
+  const [view, setView] = useState("landing");
+  const [showPinGate, setShowPinGate] = useState(false);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(
     () => getSavedData(NODES_STORAGE_KEY)
@@ -62,10 +64,6 @@ function App() {
   useEffect(() => {
     localStorage.setItem(EDGES_STORAGE_KEY, JSON.stringify(edges));
   }, [edges]);
-
-  useEffect(() => {
-    localStorage.setItem(VIEW_STORAGE_KEY, view);
-  }, [view]);
 
   useEffect(() => {
     if (view !== "editor" || nodes.length === 0) {
@@ -129,7 +127,24 @@ function App() {
     delete notificationTimers.current[id];
   };
 
-  const openEditor = () => setView("editor");
+  const openEditor = () => {
+    if (isEditorUnlocked()) {
+      setView("editor");
+      return;
+    }
+
+    setShowPinGate(true);
+  };
+
+  const handleEditorUnlocked = () => {
+    setShowPinGate(false);
+    setView("editor");
+  };
+
+  const goHome = () => {
+    lockEditor();
+    setView("landing");
+  };
 
   const addNode = (nodeType) => {
     const nodeAlreadyExists = nodes.some(
@@ -252,7 +267,17 @@ function App() {
   };
 
   if (view === "landing") {
-    return <LandingPage onOpenEditor={openEditor} />;
+    return (
+      <>
+        <LandingPage onOpenEditor={openEditor} />
+        {showPinGate && (
+          <EditorPinGate
+            onClose={() => setShowPinGate(false)}
+            onSuccess={handleEditorUnlocked}
+          />
+        )}
+      </>
+    );
   }
 
   return (
@@ -261,7 +286,7 @@ function App() {
         runWorkflow={runWorkflow}
         stopWorkflow={stopWorkflow}
         openCredentials={() => setShowCredentials(true)}
-        onGoHome={() => setView("landing")}
+        onGoHome={goHome}
         executionState={executionState}
       />
 

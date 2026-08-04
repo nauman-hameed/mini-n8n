@@ -23,6 +23,9 @@ from routes.whatsapp_webhook import (
 from routes.workflow import (
     router as workflow_router,
 )
+from routes.auth import (
+    router as auth_router,
+)
 from routes.setup import (
     router as setup_router,
 )
@@ -54,6 +57,9 @@ app.include_router(workflow_router)
 
 # Production diagnostics
 app.include_router(setup_router)
+
+# Editor PIN verification
+app.include_router(auth_router)
 
 
 allowed_origins = [
