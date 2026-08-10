@@ -37,8 +37,7 @@
   --shadow-md: 0 16px 48px rgba(0, 0, 0, 0.45);
   --shadow-lg: 0 32px 80px rgba(0, 0, 0, 0.55);
   --container: 1180px;
-  --nav-height: 68px;
-  --landing-peek: 96px;
+  --nav-height: 76px;
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
   --transition: 0.22s var(--ease);
 }
@@ -358,77 +357,43 @@
   background: var(--accent-soft);
 }
 
-/* First viewport: nav + hero + trust, with How It Works peeking below */
-.landing-fold {
-  min-height: calc(100svh - var(--landing-peek));
-  display: flex;
-  flex-direction: column;
-}
-
-.landing-fold .saas-navbar {
-  flex: 0 0 var(--nav-height);
-  position: relative;
-}
-
+/* Hero */
 .saas-hero {
-  flex: 1 1 auto;
-  display: flex;
-  align-items: center;
-  min-height: 0;
-  padding: clamp(20px, 3.5vh, 40px) 0 clamp(16px, 2.5vh, 28px);
+  padding: 72px 0 96px;
 }
 
 .saas-hero__grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-  gap: clamp(28px, 4vw, 56px);
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 56px;
   align-items: center;
-  width: 100%;
-}
-
-.saas-hero .saas-eyebrow {
-  margin-bottom: clamp(8px, 1.2vh, 14px);
 }
 
 .saas-hero__copy h1 {
-  font-size: clamp(2rem, 4.2vw, 3.25rem);
+  font-size: clamp(2.4rem, 5vw, 3.75rem);
   font-weight: 800;
   letter-spacing: -0.045em;
-  line-height: 1.06;
+  line-height: 1.05;
   color: var(--text);
   text-shadow: 0 0 60px rgba(0, 210, 255, 0.15);
-  max-width: 15ch;
 }
 
 .saas-lead {
-  margin-top: clamp(12px, 1.8vh, 20px);
-  max-width: 42ch;
+  margin-top: 22px;
+  max-width: 520px;
   color: var(--text-secondary);
-  font-size: clamp(15px, 1.45vw, 17px);
-  line-height: 1.6;
+  font-size: 18px;
+  line-height: 1.7;
 }
 
 .saas-hero__actions {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-  margin-top: clamp(18px, 2.8vh, 32px);
+  gap: 14px;
+  margin-top: 36px;
 }
 
-.saas-hero__visual {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  min-width: 0;
-}
-
-.saas-hero__visual .hero-mock {
-  width: 100%;
-  max-width: 520px;
-}
-
-/* Hero mock — compact enough for the first fold */
+/* Hero mock */
 .hero-mock {
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-xl);
@@ -454,14 +419,14 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 11px 16px;
+  padding: 14px 18px;
   border-bottom: 1px solid var(--border);
   background: rgba(5, 8, 16, 0.6);
 }
 
 .hero-mock__chrome span {
-  width: 9px;
-  height: 9px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: #334155;
 }
@@ -492,18 +457,18 @@
 }
 
 .hero-mock__body {
-  padding: clamp(12px, 1.8vh, 18px);
+  padding: 20px;
 }
 
 .hero-mock__stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-bottom: 12px;
+  gap: 10px;
+  margin-bottom: 16px;
 }
 
 .hero-mock__stats div {
-  padding: clamp(10px, 1.4vh, 14px) 12px;
+  padding: 14px 12px;
   border-radius: var(--radius-md);
   background: rgba(0, 210, 255, 0.04);
   border: 1px solid var(--border);
@@ -511,7 +476,7 @@
 
 .hero-mock__stats strong {
   display: block;
-  font-size: clamp(16px, 1.7vw, 20px);
+  font-size: 20px;
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--accent);
@@ -527,15 +492,15 @@
 
 .hero-mock__chat {
   display: grid;
-  gap: 8px;
+  gap: 10px;
 }
 
 .hero-mock__msg {
   max-width: 88%;
-  padding: 10px 13px;
+  padding: 12px 14px;
   border-radius: 14px;
   font-size: 13px;
-  line-height: 1.45;
+  line-height: 1.5;
 }
 
 .hero-mock__msg--in {
@@ -556,7 +521,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 9px 12px;
+  padding: 10px 12px;
   border-radius: var(--radius-md);
   background: var(--success-soft);
   border: 1px solid rgba(52, 211, 153, 0.25);
@@ -568,29 +533,24 @@
 
 /* Trust strip */
 .trust-strip {
-  flex: 0 0 auto;
   border-block: 1px solid var(--border);
   background: rgba(8, 12, 24, 0.7);
 }
 
 .trust-strip__inner {
   display: flex;
-  flex-wrap: nowrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px 24px;
-  padding: clamp(14px, 2vh, 20px) 0;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 28px 40px;
+  padding: 22px 0;
 }
 
 .trust-strip__inner span {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: 8px;
-  flex: 1 1 0;
-  white-space: nowrap;
   color: var(--text-muted);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -598,7 +558,6 @@
 }
 
 .trust-strip__inner svg {
-  flex-shrink: 0;
   color: var(--accent);
   filter: drop-shadow(0 0 6px rgba(0, 210, 255, 0.5));
 }
@@ -606,10 +565,6 @@
 /* Sections */
 .saas-section {
   padding: 96px 0;
-}
-
-.landing-page #how-it-works {
-  padding-top: clamp(48px, 6vh, 72px);
 }
 
 .saas-section--muted {
@@ -1415,39 +1370,10 @@
 
 /* Responsive */
 @media (max-width: 1024px) {
-  .landing-fold {
-    min-height: auto;
-  }
-
-  .saas-hero {
-    padding: 36px 0 24px;
-  }
-
-  .saas-hero__copy h1 {
-    max-width: none;
-  }
-
-  .saas-hero__visual {
-    justify-content: stretch;
-  }
-
-  .saas-hero__visual .hero-mock {
-    max-width: none;
-  }
-
-  .trust-strip__inner {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .trust-strip__inner span {
-    flex: 0 1 auto;
-  }
-
   .saas-hero__grid,
   .use-case {
     grid-template-columns: 1fr;
-    gap: 32px;
+    gap: 40px;
   }
 
   .feature-grid {

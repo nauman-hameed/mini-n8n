@@ -44,15 +44,15 @@ const TRUST_ITEMS = [
 export default function LandingPage() {
   return (
     <div className="saas-page landing-page">
-      <div className="landing-fold">
-        <SaasNavbar />
+      <SaasNavbar />
 
+      <main>
         <section className="saas-hero">
           <div className="saas-container saas-hero__grid">
             <div className="saas-hero__copy saas-animate-in">
               <p className="saas-eyebrow">
                 <Sparkles size={14} aria-hidden="true" />
-                // AI BUSINESS ASSISTANT |
+                | // AI BUSINESS ASSISTANT |
               </p>
               <h1>Your AI Business Assistant for WhatsApp</h1>
               <p className="saas-lead">
@@ -120,9 +120,7 @@ export default function LandingPage() {
             ))}
           </div>
         </section>
-      </div>
 
-      <main>
         <section className="saas-section saas-section--muted" id="how-it-works">
           <div className="saas-container">
             <div className="saas-section-header saas-reveal">
