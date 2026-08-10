@@ -43,7 +43,6 @@ export default function SaasNavbar() {
           className={`saas-navbar__links ${mobileOpen ? "saas-navbar__links--open" : ""}`}
           aria-label="Primary"
         >
-          <a href="/#features">Features</a>
           <a href="/#how-it-works">How It Works</a>
           <Link to="/login" className="saas-btn saas-btn-secondary saas-btn-sm">
             Login

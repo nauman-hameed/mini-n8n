@@ -15,7 +15,7 @@ export default function SaasFooter() {
           <h3>Product</h3>
           <Link to="/signup">Get Started</Link>
           <Link to="/login">Login</Link>
-          <a href="/#features">Features</a>
+          <a href="/#how-it-works">How It Works</a>
         </div>
 
         <div className="saas-footer__col">

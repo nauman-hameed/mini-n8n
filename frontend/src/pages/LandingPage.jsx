@@ -5,47 +5,11 @@ import {
   CheckCircle2,
   ClipboardList,
   MessageCircle,
-  Shield,
   Sparkles,
-  Workflow,
-  Zap,
 } from "lucide-react";
 
 import SaasFooter from "../components/saas/SaasFooter";
 import SaasNavbar from "../components/saas/SaasNavbar";
-
-const FEATURES = [
-  {
-    icon: MessageCircle,
-    title: "Customer conversations",
-    desc: "Stay responsive on WhatsApp without manually handling every message.",
-  },
-  {
-    icon: ClipboardList,
-    title: "Order capture",
-    desc: "Turn unstructured chats into organized business information.",
-  },
-  {
-    icon: Workflow,
-    title: "Business organization",
-    desc: "Keep operations structured instead of scattered across threads.",
-  },
-  {
-    icon: Bot,
-    title: "AI assistance",
-    desc: "Prepare for intelligent responses powered by your business context.",
-  },
-  {
-    icon: Zap,
-    title: "Less repetitive work",
-    desc: "Automate routine tasks so you can focus on growth.",
-  },
-  {
-    icon: Shield,
-    title: "Secure setup",
-    desc: "Professional authentication and protected business data.",
-  },
-];
 
 const STEPS = [
   {
@@ -157,35 +121,10 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="saas-section" id="features">
-          <div className="saas-container">
-            <div className="saas-section-header saas-reveal">
-              <p className="saas-eyebrow">01 — Features</p>
-              <h2>Everything you need to run customer operations smarter</h2>
-              <p>
-                NH is designed as a premium SaaS product — focused on outcomes,
-                not workflow complexity.
-              </p>
-            </div>
-
-            <div className="feature-grid">
-              {FEATURES.map(({ icon: Icon, title, desc }) => (
-                <article key={title} className="feature-card saas-reveal">
-                  <div className="feature-card__icon">
-                    <Icon size={22} strokeWidth={1.75} aria-hidden="true" />
-                  </div>
-                  <h3>{title}</h3>
-                  <p>{desc}</p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-
         <section className="saas-section saas-section--muted" id="how-it-works">
           <div className="saas-container">
             <div className="saas-section-header saas-reveal">
-              <p className="saas-eyebrow">02 — How It Works</p>
+              <p className="saas-eyebrow">01 — How It Works</p>
               <h2>From signup to assistant in four steps</h2>
             </div>
 
@@ -204,7 +143,7 @@ export default function LandingPage() {
         <section className="saas-section">
           <div className="saas-container use-case saas-reveal">
             <div className="use-case__copy">
-              <p className="saas-eyebrow">03 — Use Case</p>
+              <p className="saas-eyebrow">02 — Use Case</p>
               <h2>From customer message to organized business data</h2>
               <p>
                 Illustrative preview of how NH will help you understand
