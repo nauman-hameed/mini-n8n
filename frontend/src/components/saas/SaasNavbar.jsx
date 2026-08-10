@@ -23,7 +23,7 @@ export default function SaasNavbar() {
   return (
     <header className={`saas-navbar ${scrolled ? "saas-navbar--scrolled" : ""}`}>
       <div className="saas-container saas-navbar__inner">
-        <Link to="/" className="saas-navbar__brand" aria-label="Hoplynk home">
+        <Link to="/" className="saas-navbar__brand" aria-label="NH home">
           <BrandMark />
         </Link>
 

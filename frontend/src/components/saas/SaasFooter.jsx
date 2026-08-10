@@ -31,7 +31,7 @@ export default function SaasFooter() {
       </div>
 
       <div className="saas-container saas-footer__bottom">
-        <p>© {new Date().getFullYear()} Hoplynk Assistant. All rights reserved.</p>
+        <p>© {new Date().getFullYear()} NH. All rights reserved.</p>
       </div>
     </footer>
   );

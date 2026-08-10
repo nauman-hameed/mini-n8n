@@ -4,7 +4,7 @@ export default function BrandMark({ showText = true, size = "md" }) {
   return (
     <span className={`brand-mark brand-mark--${size}`}>
       <Logo />
-      {showText ? <span className="brand-mark__text">Hoplynk</span> : null}
+      {showText ? <span className="brand-mark__text">NH</span> : null}
     </span>
   );
 }

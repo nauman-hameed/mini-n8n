@@ -111,7 +111,7 @@ export default function LandingPage() {
               <div className="hero-mock">
                 <div className="hero-mock__chrome">
                   <span /><span /><span />
-                  <p>Hoplynk // Live</p>
+                  <p>NH // Live</p>
                 </div>
                 <div className="hero-mock__body">
                   <div className="hero-mock__stats">
@@ -163,8 +163,8 @@ export default function LandingPage() {
               <p className="saas-eyebrow">01 — Features</p>
               <h2>Everything you need to run customer operations smarter</h2>
               <p>
-                Hoplynk Assistant is designed as a premium SaaS product — focused
-                on outcomes, not workflow complexity.
+                NH is designed as a premium SaaS product — focused on outcomes,
+                not workflow complexity.
               </p>
             </div>
 
@@ -207,8 +207,8 @@ export default function LandingPage() {
               <p className="saas-eyebrow">03 — Use Case</p>
               <h2>From customer message to organized business data</h2>
               <p>
-                Illustrative preview of how Hoplynk Assistant will help you
-                understand requests, capture details, and keep operations clear.
+                Illustrative preview of how NH will help you understand
+                requests, capture details, and keep operations clear.
               </p>
             </div>
             <div className="use-case__flow" aria-hidden="true">
