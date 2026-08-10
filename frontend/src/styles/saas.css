@@ -357,60 +357,43 @@
   background: var(--accent-soft);
 }
 
-/* First screen: nav + hero + trust strip fit without scrolling */
-.landing-fold {
-  min-height: calc(100svh - var(--nav-height));
-  max-height: calc(100svh - var(--nav-height));
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
+/* Hero */
 .saas-hero {
-  flex: 1 1 auto;
-  display: flex;
-  align-items: center;
-  min-height: 0;
-  padding: clamp(20px, 3.5vh, 40px) 0 clamp(12px, 2vh, 24px);
+  padding: 72px 0 96px;
 }
 
 .saas-hero__grid {
   display: grid;
   grid-template-columns: 1.05fr 0.95fr;
-  gap: clamp(24px, 4vw, 48px);
+  gap: 56px;
   align-items: center;
-  width: 100%;
 }
 
 .saas-hero__copy h1 {
-  font-size: clamp(2rem, 4.2vw, 3.1rem);
+  font-size: clamp(2.4rem, 5vw, 3.75rem);
   font-weight: 800;
   letter-spacing: -0.045em;
-  line-height: 1.06;
+  line-height: 1.05;
   color: var(--text);
   text-shadow: 0 0 60px rgba(0, 210, 255, 0.15);
 }
 
 .saas-lead {
-  margin-top: clamp(12px, 1.8vh, 18px);
+  margin-top: 22px;
   max-width: 520px;
   color: var(--text-secondary);
-  font-size: clamp(14px, 1.5vw, 17px);
-  line-height: 1.55;
+  font-size: 18px;
+  line-height: 1.7;
 }
 
 .saas-hero__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-top: clamp(16px, 2.5vh, 28px);
+  gap: 14px;
+  margin-top: 36px;
 }
 
-.saas-hero .saas-eyebrow {
-  margin-bottom: clamp(8px, 1.2vh, 14px);
-}
-
-/* Hero mock — compact for first fold */
+/* Hero mock */
 .hero-mock {
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-xl);
@@ -436,14 +419,14 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 14px;
+  padding: 14px 18px;
   border-bottom: 1px solid var(--border);
   background: rgba(5, 8, 16, 0.6);
 }
 
 .hero-mock__chrome span {
-  width: 9px;
-  height: 9px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: #334155;
 }
@@ -474,18 +457,18 @@
 }
 
 .hero-mock__body {
-  padding: clamp(12px, 1.8vh, 16px);
+  padding: 20px;
 }
 
 .hero-mock__stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-bottom: 10px;
+  gap: 10px;
+  margin-bottom: 16px;
 }
 
 .hero-mock__stats div {
-  padding: 10px 10px;
+  padding: 14px 12px;
   border-radius: var(--radius-md);
   background: rgba(0, 210, 255, 0.04);
   border: 1px solid var(--border);
@@ -493,7 +476,7 @@
 
 .hero-mock__stats strong {
   display: block;
-  font-size: clamp(15px, 1.6vw, 18px);
+  font-size: 20px;
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--accent);
@@ -501,7 +484,7 @@
 }
 
 .hero-mock__stats span {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--text-muted);
   font-family: var(--font-mono);
   letter-spacing: 0.02em;
@@ -509,15 +492,15 @@
 
 .hero-mock__chat {
   display: grid;
-  gap: 8px;
+  gap: 10px;
 }
 
 .hero-mock__msg {
   max-width: 88%;
-  padding: 10px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  line-height: 1.45;
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .hero-mock__msg--in {
@@ -538,19 +521,18 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 10px;
+  padding: 10px 12px;
   border-radius: var(--radius-md);
   background: var(--success-soft);
   border: 1px solid rgba(52, 211, 153, 0.25);
   color: var(--success);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   font-family: var(--font-mono);
 }
 
 /* Trust strip */
 .trust-strip {
-  flex: 0 0 auto;
   border-block: 1px solid var(--border);
   background: rgba(8, 12, 24, 0.7);
 }
@@ -559,8 +541,8 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 16px 28px;
-  padding: clamp(12px, 1.8vh, 18px) 0;
+  gap: 28px 40px;
+  padding: 22px 0;
 }
 
 .trust-strip__inner span {
@@ -568,7 +550,7 @@
   align-items: center;
   gap: 8px;
   color: var(--text-muted);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1388,20 +1370,10 @@
 
 /* Responsive */
 @media (max-width: 1024px) {
-  .landing-fold {
-    min-height: auto;
-    max-height: none;
-    overflow: visible;
-  }
-
-  .saas-hero {
-    padding: 36px 0 24px;
-  }
-
   .saas-hero__grid,
   .use-case {
     grid-template-columns: 1fr;
-    gap: 32px;
+    gap: 40px;
   }
 
   .feature-grid {
