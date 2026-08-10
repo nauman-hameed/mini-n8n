@@ -45,7 +45,9 @@ export default function SaasNavbar() {
         >
           <a href="/#features">Features</a>
           <a href="/#how-it-works">How It Works</a>
-          <Link to="/login">Login</Link>
+          <Link to="/login" className="saas-btn saas-btn-secondary saas-btn-sm">
+            Login
+          </Link>
           <Link to="/signup" className="saas-btn saas-btn-primary saas-btn-sm">
             Get Started
           </Link>

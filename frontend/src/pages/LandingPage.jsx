@@ -88,7 +88,7 @@ export default function LandingPage() {
             <div className="saas-hero__copy saas-animate-in">
               <p className="saas-eyebrow">
                 <Sparkles size={14} aria-hidden="true" />
-                AI Business Assistant
+                | // AI BUSINESS ASSISTANT |
               </p>
               <h1>Your AI Business Assistant for WhatsApp</h1>
               <p className="saas-lead">
@@ -111,7 +111,7 @@ export default function LandingPage() {
               <div className="hero-mock">
                 <div className="hero-mock__chrome">
                   <span /><span /><span />
-                  <p>Hoplynk Assistant</p>
+                  <p>Hoplynk // Live</p>
                 </div>
                 <div className="hero-mock__body">
                   <div className="hero-mock__stats">
@@ -160,7 +160,7 @@ export default function LandingPage() {
         <section className="saas-section" id="features">
           <div className="saas-container">
             <div className="saas-section-header saas-reveal">
-              <p className="saas-eyebrow">Features</p>
+              <p className="saas-eyebrow">01 — Features</p>
               <h2>Everything you need to run customer operations smarter</h2>
               <p>
                 Hoplynk Assistant is designed as a premium SaaS product — focused
@@ -185,7 +185,7 @@ export default function LandingPage() {
         <section className="saas-section saas-section--muted" id="how-it-works">
           <div className="saas-container">
             <div className="saas-section-header saas-reveal">
-              <p className="saas-eyebrow">How It Works</p>
+              <p className="saas-eyebrow">02 — How It Works</p>
               <h2>From signup to assistant in four steps</h2>
             </div>
 
@@ -204,7 +204,7 @@ export default function LandingPage() {
         <section className="saas-section">
           <div className="saas-container use-case saas-reveal">
             <div className="use-case__copy">
-              <p className="saas-eyebrow">Use Case</p>
+              <p className="saas-eyebrow">03 — Use Case</p>
               <h2>From customer message to organized business data</h2>
               <p>
                 Illustrative preview of how Hoplynk Assistant will help you
@@ -240,6 +240,7 @@ export default function LandingPage() {
         <section className="saas-cta">
           <div className="saas-container saas-cta__inner saas-reveal">
             <div>
+              <p className="saas-eyebrow">Ready when you are</p>
               <h2>Set up your business assistant in minutes</h2>
               <p>Create your account and complete initial business setup today.</p>
             </div>
