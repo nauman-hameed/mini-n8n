@@ -47,79 +47,81 @@ export default function LandingPage() {
       <SaasNavbar />
 
       <main>
-        <section className="saas-hero">
-          <div className="saas-container saas-hero__grid">
-            <div className="saas-hero__copy saas-animate-in">
-              <p className="saas-eyebrow">
-                <Sparkles size={14} aria-hidden="true" />
-                | // AI BUSINESS ASSISTANT |
-              </p>
-              <h1>Your AI Business Assistant for WhatsApp</h1>
-              <p className="saas-lead">
-                Handle customer messages, capture orders, and reduce repetitive
-                work — with a polished assistant built for business owners, not
-                automation engineers.
-              </p>
-              <div className="saas-hero__actions">
-                <Link to="/signup" className="saas-btn saas-btn-primary saas-btn-lg">
-                  Get Started
-                  <ArrowRight size={18} aria-hidden="true" />
-                </Link>
-                <a href="#how-it-works" className="saas-btn saas-btn-secondary saas-btn-lg">
-                  See How It Works
-                </a>
-              </div>
-            </div>
-
-            <div className="saas-hero__visual saas-animate-in saas-animate-delay-1" aria-hidden="true">
-              <div className="hero-mock">
-                <div className="hero-mock__chrome">
-                  <span /><span /><span />
-                  <p>NH // Live</p>
-                </div>
-                <div className="hero-mock__body">
-                  <div className="hero-mock__stats">
-                    <div>
-                      <strong>12</strong>
-                      <span>Messages today</span>
-                    </div>
-                    <div>
-                      <strong>5</strong>
-                      <span>Orders captured</span>
-                    </div>
-                    <div>
-                      <strong>Live</strong>
-                      <span>Assistant status</span>
-                    </div>
-                  </div>
-                  <div className="hero-mock__chat">
-                    <div className="hero-mock__msg hero-mock__msg--in">
-                      Hi, I&apos;d like 2 shirts and 1 pair of shoes.
-                    </div>
-                    <div className="hero-mock__msg hero-mock__msg--out">
-                      Thanks — we&apos;ve captured your order details.
-                    </div>
-                    <div className="hero-mock__capture">
-                      <CheckCircle2 size={14} />
-                      Order structured · Name · Items · Phone
-                    </div>
-                  </div>
+        <div className="landing-fold">
+          <section className="saas-hero">
+            <div className="saas-container saas-hero__grid">
+              <div className="saas-hero__copy saas-animate-in">
+                <p className="saas-eyebrow">
+                  <Sparkles size={14} aria-hidden="true" />
+                  | // AI BUSINESS ASSISTANT |
+                </p>
+                <h1>Your AI Business Assistant for WhatsApp</h1>
+                <p className="saas-lead">
+                  Handle customer messages, capture orders, and reduce repetitive
+                  work — with a polished assistant built for business owners, not
+                  automation engineers.
+                </p>
+                <div className="saas-hero__actions">
+                  <Link to="/signup" className="saas-btn saas-btn-primary saas-btn-lg">
+                    Get Started
+                    <ArrowRight size={18} aria-hidden="true" />
+                  </Link>
+                  <a href="#how-it-works" className="saas-btn saas-btn-secondary saas-btn-lg">
+                    See How It Works
+                  </a>
                 </div>
               </div>
-            </div>
-          </div>
-        </section>
 
-        <section className="trust-strip">
-          <div className="saas-container trust-strip__inner">
-            {TRUST_ITEMS.map((item) => (
-              <span key={item}>
-                <CheckCircle2 size={16} aria-hidden="true" />
-                {item}
-              </span>
-            ))}
-          </div>
-        </section>
+              <div className="saas-hero__visual saas-animate-in saas-animate-delay-1" aria-hidden="true">
+                <div className="hero-mock">
+                  <div className="hero-mock__chrome">
+                    <span /><span /><span />
+                    <p>NH // Live</p>
+                  </div>
+                  <div className="hero-mock__body">
+                    <div className="hero-mock__stats">
+                      <div>
+                        <strong>12</strong>
+                        <span>Messages today</span>
+                      </div>
+                      <div>
+                        <strong>5</strong>
+                        <span>Orders captured</span>
+                      </div>
+                      <div>
+                        <strong>Live</strong>
+                        <span>Assistant status</span>
+                      </div>
+                    </div>
+                    <div className="hero-mock__chat">
+                      <div className="hero-mock__msg hero-mock__msg--in">
+                        Hi, I&apos;d like 2 shirts and 1 pair of shoes.
+                      </div>
+                      <div className="hero-mock__msg hero-mock__msg--out">
+                        Thanks — we&apos;ve captured your order details.
+                      </div>
+                      <div className="hero-mock__capture">
+                        <CheckCircle2 size={14} />
+                        Order structured · Name · Items · Phone
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="trust-strip">
+            <div className="saas-container trust-strip__inner">
+              {TRUST_ITEMS.map((item) => (
+                <span key={item}>
+                  <CheckCircle2 size={16} aria-hidden="true" />
+                  {item}
+                </span>
+              ))}
+            </div>
+          </section>
+        </div>
 
         <section className="saas-section saas-section--muted" id="how-it-works">
           <div className="saas-container">
