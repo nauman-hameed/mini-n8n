@@ -17,7 +17,9 @@ CREDENTIAL_ENCRYPTION_KEY = _clean_env(
     os.getenv("CREDENTIAL_ENCRYPTION_KEY")
 )
 
-FRONTEND_URL = os.getenv("FRONTEND_URL")
+FRONTEND_URL = _clean_env(os.getenv("FRONTEND_URL"))
+if FRONTEND_URL:
+    FRONTEND_URL = FRONTEND_URL.rstrip("/")
 BACKEND_URL = os.getenv("BACKEND_URL")
 
 _railway_domain = os.getenv("RAILWAY_PUBLIC_DOMAIN")
@@ -58,3 +60,20 @@ GOOGLE_SPREADSHEET_ID = _clean_env(
     os.getenv("GOOGLE_SPREADSHEET_ID")
 )
 GOOGLE_TOKEN_JSON = os.getenv("GOOGLE_TOKEN_JSON")
+
+JWT_SECRET_KEY = _clean_env(os.getenv("JWT_SECRET_KEY"))
+JWT_ACCESS_TOKEN_EXPIRE_MINUTES = int(
+    os.getenv("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "10080")
+)
+
+DATABASE_URL = _clean_env(os.getenv("DATABASE_URL"))
+
+AUTH_COOKIE_SECURE = os.getenv("AUTH_COOKIE_SECURE", "").lower() in {
+    "1",
+    "true",
+    "yes",
+} or bool(os.getenv("RAILWAY_PUBLIC_DOMAIN"))
+
+AUTH_COOKIE_SAMESITE = _clean_env(
+    os.getenv("AUTH_COOKIE_SAMESITE")
+) or "none" if AUTH_COOKIE_SECURE else "lax"

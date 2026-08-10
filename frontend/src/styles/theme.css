@@ -54,7 +54,7 @@ body,
 }
 
 body {
-  overflow: hidden;
+  overflow: auto;
   font-family: var(--font);
   font-size: 14px;
   color: var(--color-text);

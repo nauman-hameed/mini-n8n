@@ -1,10 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+import os
 
 from config import (
     APP_ENV,
     FRONTEND_URL,
+    JWT_SECRET_KEY,
     OLLAMA_MODEL,
 )
 
@@ -26,6 +28,13 @@ from routes.workflow import (
 from routes.setup import (
     router as setup_router,
 )
+from routes.auth import (
+    router as auth_router,
+)
+from routes.business import (
+    router as business_router,
+)
+from database import init_db
 
 
 print("APP_ENV:", APP_ENV)
@@ -36,7 +45,13 @@ app = FastAPI()
 
 
 @app.on_event("startup")
-def seed_default_workflow() -> None:
+def on_startup() -> None:
+    if os.getenv("RAILWAY_PUBLIC_DOMAIN") and not JWT_SECRET_KEY:
+        raise RuntimeError(
+            "JWT_SECRET_KEY must be set in production (Railway environment)."
+        )
+
+    init_db()
     _seed_default_workflow_if_needed()
 
 
@@ -54,6 +69,10 @@ app.include_router(workflow_router)
 
 # Production diagnostics
 app.include_router(setup_router)
+
+# User authentication and business onboarding
+app.include_router(auth_router)
+app.include_router(business_router)
 
 
 allowed_origins = [

@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 import Logo from "./Logo";
 
 function Navbar({
@@ -5,6 +7,7 @@ function Navbar({
   stopWorkflow,
   openCredentials,
   onGoHome,
+  homeTo,
   executionState,
 }) {
   const { status, message } = executionState;
@@ -28,20 +31,32 @@ function Navbar({
           ? "Failed"
           : "Ready");
 
+  const brandInner = (
+    <>
+      <Logo />
+      <div>
+        <div className="navbar-title">mini-n8n</div>
+        <div className="navbar-subtitle">Internal Editor</div>
+      </div>
+    </>
+  );
+
   return (
     <header className="navbar">
-      <div
-        className="navbar-brand"
-        onClick={onGoHome}
-        role="button"
-        tabIndex={0}
-      >
-        <Logo />
-        <div>
-          <div className="navbar-title">mini-n8n</div>
-          <div className="navbar-subtitle">Workflow Editor</div>
+      {homeTo ? (
+        <Link to={homeTo} className="navbar-brand navbar-brand-link">
+          {brandInner}
+        </Link>
+      ) : (
+        <div
+          className="navbar-brand"
+          onClick={onGoHome}
+          role="button"
+          tabIndex={0}
+        >
+          {brandInner}
         </div>
-      </div>
+      )}
 
       <div className="navbar-actions">
         <div className={`navbar-status ${statusClass}`}>
