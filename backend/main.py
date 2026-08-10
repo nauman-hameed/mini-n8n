@@ -34,7 +34,7 @@ from routes.auth import (
 from routes.business import (
     router as business_router,
 )
-from database import init_db
+from database import engine, init_db
 
 
 print("APP_ENV:", APP_ENV)
@@ -100,6 +100,20 @@ app.add_middleware(
 def home():
     return {
         "message": "Mini n8n backend is working"
+    }
+
+
+@app.get("/health")
+def health():
+    """Public liveness check — reports DB dialect only, never connection secrets."""
+    dialect = engine.dialect.name
+    database_url_configured = bool(os.getenv("DATABASE_URL"))
+
+    return {
+        "ok": True,
+        "database": dialect,
+        "database_url_configured": database_url_configured,
+        "persistent": dialect != "sqlite",
     }
 
 
