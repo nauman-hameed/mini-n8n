@@ -357,27 +357,16 @@
   background: var(--accent-soft);
 }
 
-/* First viewport: hero + trust strip fill the screen so
-   How It Works never peeks halfway into the fold */
-.landing-fold {
-  min-height: calc(100svh - var(--nav-height));
-  display: flex;
-  flex-direction: column;
-}
-
+/* Hero */
 .saas-hero {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  padding: 40px 0 32px;
+  padding: 72px 0 96px;
 }
 
 .saas-hero__grid {
   display: grid;
   grid-template-columns: 1.05fr 0.95fr;
-  gap: 48px;
+  gap: 56px;
   align-items: center;
-  width: 100%;
 }
 
 .saas-hero__copy h1 {
@@ -575,17 +564,12 @@
 
 /* Sections */
 .saas-section {
-  padding: 88px 0;
-  scroll-margin-top: calc(var(--nav-height) + 24px);
+  padding: 96px 0;
 }
 
 .saas-section--muted {
   background: rgba(8, 12, 24, 0.55);
   border-block: 1px solid var(--border);
-}
-
-#how-it-works .saas-section-header {
-  margin-bottom: 40px;
 }
 
 .feature-grid {
@@ -1386,14 +1370,6 @@
 
 /* Responsive */
 @media (max-width: 1024px) {
-  .landing-fold {
-    min-height: auto;
-  }
-
-  .saas-hero {
-    padding: 40px 0 28px;
-  }
-
   .saas-hero__grid,
   .use-case {
     grid-template-columns: 1fr;
