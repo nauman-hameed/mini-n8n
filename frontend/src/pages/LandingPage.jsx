@@ -1,200 +1,257 @@
 import { Link } from "react-router-dom";
+import {
+  ArrowRight,
+  Bot,
+  CheckCircle2,
+  ClipboardList,
+  MessageCircle,
+  Shield,
+  Sparkles,
+  Workflow,
+  Zap,
+} from "lucide-react";
 
-import Logo from "../components/Logo";
+import SaasFooter from "../components/saas/SaasFooter";
+import SaasNavbar from "../components/saas/SaasNavbar";
+
+const FEATURES = [
+  {
+    icon: MessageCircle,
+    title: "Customer conversations",
+    desc: "Stay responsive on WhatsApp without manually handling every message.",
+  },
+  {
+    icon: ClipboardList,
+    title: "Order capture",
+    desc: "Turn unstructured chats into organized business information.",
+  },
+  {
+    icon: Workflow,
+    title: "Business organization",
+    desc: "Keep operations structured instead of scattered across threads.",
+  },
+  {
+    icon: Bot,
+    title: "AI assistance",
+    desc: "Prepare for intelligent responses powered by your business context.",
+  },
+  {
+    icon: Zap,
+    title: "Less repetitive work",
+    desc: "Automate routine tasks so you can focus on growth.",
+  },
+  {
+    icon: Shield,
+    title: "Secure setup",
+    desc: "Professional authentication and protected business data.",
+  },
+];
+
+const STEPS = [
+  {
+    n: "01",
+    title: "Create your account",
+    desc: "Sign up with your name, email, and password in minutes.",
+  },
+  {
+    n: "02",
+    title: "Add your business",
+    desc: "Tell us your business name and the WhatsApp number you plan to use.",
+  },
+  {
+    n: "03",
+    title: "Connect WhatsApp",
+    desc: "Link your WhatsApp Business account — coming in the next release.",
+  },
+  {
+    n: "04",
+    title: "Activate your assistant",
+    desc: "Your assistant handles conversations and operations behind the scenes.",
+  },
+];
+
+const TRUST_ITEMS = [
+  "Built for growing businesses",
+  "Secure account setup",
+  "Simple onboarding",
+  "AI-assisted workflows",
+];
 
 export default function LandingPage() {
   return (
     <div className="saas-page landing-page">
-      <header className="saas-nav">
-        <Link to="/" className="saas-nav-brand">
-          <Logo />
-          <span>Hoplynk Assistant</span>
-        </Link>
-
-        <nav className="saas-nav-links" aria-label="Primary">
-          <a href="#features">Features</a>
-          <a href="#how-it-works">How It Works</a>
-          <Link to="/login">Login</Link>
-          <Link to="/signup" className="saas-btn saas-btn-primary">
-            Get Started
-          </Link>
-        </nav>
-      </header>
+      <SaasNavbar />
 
       <main>
         <section className="saas-hero">
-          <div className="saas-hero-copy">
-            <p className="saas-eyebrow">AI Business Assistant</p>
-            <h1>Your AI Business Assistant for WhatsApp</h1>
-            <p className="saas-lead">
-              Help your business stay responsive, organized, and ready to grow.
-              Hoplynk Assistant is being built to manage customer conversations,
-              orders, and routine operations through WhatsApp — without the
-              complexity of manual setup.
-            </p>
-            <div className="saas-hero-actions">
-              <Link to="/signup" className="saas-btn saas-btn-primary saas-btn-lg">
-                Get Started
-              </Link>
-              <a href="#how-it-works" className="saas-btn saas-btn-secondary saas-btn-lg">
-                See How It Works
-              </a>
+          <div className="saas-container saas-hero__grid">
+            <div className="saas-hero__copy saas-animate-in">
+              <p className="saas-eyebrow">
+                <Sparkles size={14} aria-hidden="true" />
+                AI Business Assistant
+              </p>
+              <h1>Your AI Business Assistant for WhatsApp</h1>
+              <p className="saas-lead">
+                Handle customer messages, capture orders, and reduce repetitive
+                work — with a polished assistant built for business owners, not
+                automation engineers.
+              </p>
+              <div className="saas-hero__actions">
+                <Link to="/signup" className="saas-btn saas-btn-primary saas-btn-lg">
+                  Get Started
+                  <ArrowRight size={18} aria-hidden="true" />
+                </Link>
+                <a href="#how-it-works" className="saas-btn saas-btn-secondary saas-btn-lg">
+                  See How It Works
+                </a>
+              </div>
+            </div>
+
+            <div className="saas-hero__visual saas-animate-in saas-animate-delay-1" aria-hidden="true">
+              <div className="hero-mock">
+                <div className="hero-mock__chrome">
+                  <span /><span /><span />
+                  <p>Hoplynk Assistant</p>
+                </div>
+                <div className="hero-mock__body">
+                  <div className="hero-mock__stats">
+                    <div>
+                      <strong>12</strong>
+                      <span>Messages today</span>
+                    </div>
+                    <div>
+                      <strong>5</strong>
+                      <span>Orders captured</span>
+                    </div>
+                    <div>
+                      <strong>Live</strong>
+                      <span>Assistant status</span>
+                    </div>
+                  </div>
+                  <div className="hero-mock__chat">
+                    <div className="hero-mock__msg hero-mock__msg--in">
+                      Hi, I&apos;d like 2 shirts and 1 pair of shoes.
+                    </div>
+                    <div className="hero-mock__msg hero-mock__msg--out">
+                      Thanks — we&apos;ve captured your order details.
+                    </div>
+                    <div className="hero-mock__capture">
+                      <CheckCircle2 size={14} />
+                      Order structured · Name · Items · Phone
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
+        </section>
 
-          <div className="saas-hero-preview" aria-hidden="true">
-            <div className="preview-card">
-              <div className="preview-card-header">
-                <span>Business Overview</span>
-                <span className="preview-pill">Setup in progress</span>
-              </div>
-              <div className="preview-stat-grid">
-                <div>
-                  <strong>WhatsApp</strong>
-                  <span>Customer channel</span>
-                </div>
-                <div>
-                  <strong>Orders</strong>
-                  <span>Structured automatically</span>
-                </div>
-                <div>
-                  <strong>Assistant</strong>
-                  <span>Always on</span>
-                </div>
-              </div>
-              <div className="preview-chat">
-                <div className="preview-message incoming">
-                  Hi, I&apos;d like 2 shirts and 1 pair of shoes.
-                </div>
-                <div className="preview-message outgoing">
-                  Thanks — we&apos;ve received your order and will confirm shortly.
-                </div>
-              </div>
-            </div>
+        <section className="trust-strip">
+          <div className="saas-container trust-strip__inner">
+            {TRUST_ITEMS.map((item) => (
+              <span key={item}>
+                <CheckCircle2 size={16} aria-hidden="true" />
+                {item}
+              </span>
+            ))}
           </div>
         </section>
 
         <section className="saas-section" id="features">
-          <div className="saas-section-header">
-            <p className="saas-eyebrow">Product Benefits</p>
-            <h2>Built for business owners, not automation engineers</h2>
-            <p>
-              Hoplynk Assistant is designed to feel like a polished SaaS product —
-              simple to start, clear to use, and focused on outcomes.
-            </p>
-          </div>
+          <div className="saas-container">
+            <div className="saas-section-header saas-reveal">
+              <p className="saas-eyebrow">Features</p>
+              <h2>Everything you need to run customer operations smarter</h2>
+              <p>
+                Hoplynk Assistant is designed as a premium SaaS product — focused
+                on outcomes, not workflow complexity.
+              </p>
+            </div>
 
-          <div className="saas-feature-grid">
-            <article className="saas-feature-card">
-              <h3>Automate customer conversations</h3>
-              <p>
-                Reduce the time spent answering repetitive WhatsApp messages and
-                keep customers informed.
-              </p>
-            </article>
-            <article className="saas-feature-card">
-              <h3>Handle customer orders</h3>
-              <p>
-                Turn unstructured messages into organized business information your
-                team can act on.
-              </p>
-            </article>
-            <article className="saas-feature-card">
-              <h3>Reduce repetitive work</h3>
-              <p>
-                Let your assistant take care of routine operational tasks so you can
-                focus on growth.
-              </p>
-            </article>
-            <article className="saas-feature-card">
-              <h3>Keep operations organized</h3>
-              <p>
-                Bring customer activity into one clear place instead of scattered
-                chats and notes.
-              </p>
-            </article>
-            <article className="saas-feature-card">
-              <h3>AI-powered assistance</h3>
-              <p>
-                Use AI to understand customer intent and support smarter business
-                responses over time.
-              </p>
-            </article>
-            <article className="saas-feature-card">
-              <h3>WhatsApp-first communication</h3>
-              <p>
-                Meet customers where they already are — on the channel they use every
-                day.
-              </p>
-            </article>
+            <div className="feature-grid">
+              {FEATURES.map(({ icon: Icon, title, desc }) => (
+                <article key={title} className="feature-card saas-reveal">
+                  <div className="feature-card__icon">
+                    <Icon size={22} strokeWidth={1.75} aria-hidden="true" />
+                  </div>
+                  <h3>{title}</h3>
+                  <p>{desc}</p>
+                </article>
+              ))}
+            </div>
           </div>
         </section>
 
-        <section className="saas-section saas-section-muted" id="how-it-works">
-          <div className="saas-section-header">
-            <p className="saas-eyebrow">How It Works</p>
-            <h2>Get started in four simple steps</h2>
-          </div>
+        <section className="saas-section saas-section--muted" id="how-it-works">
+          <div className="saas-container">
+            <div className="saas-section-header saas-reveal">
+              <p className="saas-eyebrow">How It Works</p>
+              <h2>From signup to assistant in four steps</h2>
+            </div>
 
-          <ol className="saas-steps">
-            <li>
-              <span>1</span>
-              <div>
-                <h3>Create your account</h3>
-                <p>Sign up with your name, email, and password.</p>
+            <ol className="steps-grid">
+              {STEPS.map((step) => (
+                <li key={step.n} className="step-card saas-reveal">
+                  <span className="step-card__num">{step.n}</span>
+                  <h3>{step.title}</h3>
+                  <p>{step.desc}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        <section className="saas-section">
+          <div className="saas-container use-case saas-reveal">
+            <div className="use-case__copy">
+              <p className="saas-eyebrow">Use Case</p>
+              <h2>From customer message to organized business data</h2>
+              <p>
+                Illustrative preview of how Hoplynk Assistant will help you
+                understand requests, capture details, and keep operations clear.
+              </p>
+            </div>
+            <div className="use-case__flow" aria-hidden="true">
+              <div className="flow-step">
+                <MessageCircle size={20} />
+                <div>
+                  <strong>Customer messages you</strong>
+                  <p>&quot;I want 2 blue shirts, deliver to Karachi.&quot;</p>
+                </div>
               </div>
-            </li>
-            <li>
-              <span>2</span>
-              <div>
-                <h3>Add your business</h3>
-                <p>Tell us your business name so we can personalize your setup.</p>
+              <div className="flow-step">
+                <Bot size={20} />
+                <div>
+                  <strong>Assistant understands</strong>
+                  <p>Extracts intent, items, and contact details.</p>
+                </div>
               </div>
-            </li>
-            <li>
-              <span>3</span>
-              <div>
-                <h3>Connect WhatsApp</h3>
-                <p>
-                  For this milestone, you&apos;ll provide the WhatsApp number you want
-                  to use. Full Meta connection comes next.
-                </p>
+              <div className="flow-step">
+                <ClipboardList size={20} />
+                <div>
+                  <strong>Business stays organized</strong>
+                  <p>Structured records ready for your team.</p>
+                </div>
               </div>
-            </li>
-            <li>
-              <span>4</span>
-              <div>
-                <h3>Your assistant becomes ready</h3>
-                <p>
-                  Once connected, your assistant will handle business operations
-                  automatically behind the scenes.
-                </p>
-              </div>
-            </li>
-          </ol>
+            </div>
+          </div>
         </section>
 
         <section className="saas-cta">
-          <div>
-            <h2>Ready to set up your Business Assistant?</h2>
-            <p>Create your account and complete your initial business setup in minutes.</p>
+          <div className="saas-container saas-cta__inner saas-reveal">
+            <div>
+              <h2>Set up your business assistant in minutes</h2>
+              <p>Create your account and complete initial business setup today.</p>
+            </div>
+            <Link to="/signup" className="saas-btn saas-btn-white saas-btn-lg">
+              Get Started
+              <ArrowRight size={18} aria-hidden="true" />
+            </Link>
           </div>
-          <Link to="/signup" className="saas-btn saas-btn-primary saas-btn-lg">
-            Create Account
-          </Link>
         </section>
       </main>
 
-      <footer className="saas-footer">
-        <div>
-          <strong>Hoplynk Assistant</strong>
-          <p>AI-powered business operations for WhatsApp-first businesses.</p>
-        </div>
-        <div className="saas-footer-links">
-          <Link to="/login">Login</Link>
-          <Link to="/signup">Get Started</Link>
-        </div>
-      </footer>
+      <SaasFooter />
     </div>
   );
 }

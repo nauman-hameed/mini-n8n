@@ -15,6 +15,7 @@ backend/storage/credentials.json
 backend/storage/workflow.json
 backend/storage/app.db
 backend/railway-vars.raw.env
+backend/.jwt-secret.local
 backend/teacher-handoff.txt
 backend/tokens/
 backend/credentials/

@@ -1,11 +1,15 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { Loader2 } from "lucide-react";
 
 import { useAuth } from "../../context/AuthContext";
 
 function LoadingScreen() {
   return (
     <div className="saas-page">
-      <div className="saas-loading">Loading…</div>
+      <div className="saas-loading">
+        <Loader2 size={28} className="saas-spinner" aria-hidden="true" />
+        <span>Loading…</span>
+      </div>
     </div>
   );
 }

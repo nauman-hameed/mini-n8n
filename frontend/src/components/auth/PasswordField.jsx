@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function PasswordField({
   id,
@@ -11,7 +12,7 @@ export default function PasswordField({
   const [visible, setVisible] = useState(false);
 
   return (
-    <div className="saas-field">
+    <div className={`saas-field ${error ? "saas-field--error" : ""}`}>
       <label htmlFor={id}>{label}</label>
       <div className="password-input-wrap">
         <input
@@ -21,6 +22,7 @@ export default function PasswordField({
           onChange={onChange}
           autoComplete={autoComplete}
           aria-invalid={Boolean(error)}
+          className="saas-input"
         />
         <button
           type="button"
@@ -28,10 +30,10 @@ export default function PasswordField({
           onClick={() => setVisible((current) => !current)}
           aria-label={visible ? "Hide password" : "Show password"}
         >
-          {visible ? "Hide" : "Show"}
+          {visible ? <EyeOff size={16} /> : <Eye size={16} />}
         </button>
       </div>
-      {error ? <p className="field-error">{error}</p> : null}
+      {error ? <p className="field-error" role="alert">{error}</p> : null}
     </div>
   );
 }

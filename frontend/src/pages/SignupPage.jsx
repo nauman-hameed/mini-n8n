@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { ArrowRight, Loader2 } from "lucide-react";
 
 import AuthLayout from "../components/auth/AuthLayout";
 import PasswordField from "../components/auth/PasswordField";
@@ -78,8 +79,8 @@ export default function SignupPage() {
 
   return (
     <AuthLayout
-      title="Create your account"
-      subtitle="Start setting up your AI Business Assistant."
+      title="Create your business assistant account"
+      subtitle="Start with your name, email, and a secure password."
       footer={
         <p>
           Already have an account? <Link to="/login">Log in</Link>
@@ -87,30 +88,34 @@ export default function SignupPage() {
       }
     >
       <form className="auth-form" onSubmit={handleSubmit} noValidate>
-        <div className="saas-field">
+        <div className={`saas-field ${errors.fullName ? "saas-field--error" : ""}`}>
           <label htmlFor="fullName">Full Name</label>
           <input
             id="fullName"
             type="text"
+            className="saas-input"
             value={formData.fullName}
             onChange={(event) => updateField("fullName", event.target.value)}
             autoComplete="name"
             aria-invalid={Boolean(errors.fullName)}
+            placeholder="Your full name"
           />
-          {errors.fullName ? <p className="field-error">{errors.fullName}</p> : null}
+          {errors.fullName ? <p className="field-error" role="alert">{errors.fullName}</p> : null}
         </div>
 
-        <div className="saas-field">
+        <div className={`saas-field ${errors.email ? "saas-field--error" : ""}`}>
           <label htmlFor="email">Email</label>
           <input
             id="email"
             type="email"
+            className="saas-input"
             value={formData.email}
             onChange={(event) => updateField("email", event.target.value)}
             autoComplete="email"
             aria-invalid={Boolean(errors.email)}
+            placeholder="you@company.com"
           />
-          {errors.email ? <p className="field-error">{errors.email}</p> : null}
+          {errors.email ? <p className="field-error" role="alert">{errors.email}</p> : null}
         </div>
 
         <PasswordField
@@ -131,14 +136,24 @@ export default function SignupPage() {
           error={errors.confirmPassword}
         />
 
-        {submitError ? <p className="form-error">{submitError}</p> : null}
+        {submitError ? <p className="form-error" role="alert">{submitError}</p> : null}
 
         <button
           type="submit"
           className="saas-btn saas-btn-primary saas-btn-block"
           disabled={isSubmitting}
         >
-          {isSubmitting ? "Creating account…" : "Create Account"}
+          {isSubmitting ? (
+            <>
+              <Loader2 size={18} className="saas-spinner" aria-hidden="true" />
+              Creating account…
+            </>
+          ) : (
+            <>
+              Create Account
+              <ArrowRight size={18} aria-hidden="true" />
+            </>
+          )}
         </button>
       </form>
     </AuthLayout>

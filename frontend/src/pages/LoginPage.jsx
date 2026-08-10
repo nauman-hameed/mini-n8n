@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { ArrowRight, Loader2 } from "lucide-react";
 
 import AuthLayout from "../components/auth/AuthLayout";
 import PasswordField from "../components/auth/PasswordField";
@@ -68,7 +69,7 @@ export default function LoginPage() {
   return (
     <AuthLayout
       title="Welcome back"
-      subtitle="Log in to continue setting up your Business Assistant."
+      subtitle="Log in to continue managing your business assistant."
       footer={
         <p>
           New here? <Link to="/signup">Create an account</Link>
@@ -76,17 +77,19 @@ export default function LoginPage() {
       }
     >
       <form className="auth-form" onSubmit={handleSubmit} noValidate>
-        <div className="saas-field">
+        <div className={`saas-field ${errors.email ? "saas-field--error" : ""}`}>
           <label htmlFor="email">Email</label>
           <input
             id="email"
             type="email"
+            className="saas-input"
             value={formData.email}
             onChange={(event) => updateField("email", event.target.value)}
             autoComplete="email"
             aria-invalid={Boolean(errors.email)}
+            placeholder="you@company.com"
           />
-          {errors.email ? <p className="field-error">{errors.email}</p> : null}
+          {errors.email ? <p className="field-error" role="alert">{errors.email}</p> : null}
         </div>
 
         <PasswordField
@@ -98,14 +101,24 @@ export default function LoginPage() {
           error={errors.password}
         />
 
-        {submitError ? <p className="form-error">{submitError}</p> : null}
+        {submitError ? <p className="form-error" role="alert">{submitError}</p> : null}
 
         <button
           type="submit"
           className="saas-btn saas-btn-primary saas-btn-block"
           disabled={isSubmitting}
         >
-          {isSubmitting ? "Logging in…" : "Log In"}
+          {isSubmitting ? (
+            <>
+              <Loader2 size={18} className="saas-spinner" aria-hidden="true" />
+              Logging in…
+            </>
+          ) : (
+            <>
+              Log In
+              <ArrowRight size={18} aria-hidden="true" />
+            </>
+          )}
         </button>
       </form>
     </AuthLayout>
