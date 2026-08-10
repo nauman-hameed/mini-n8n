@@ -5,6 +5,7 @@ import os
 
 from config import (
     APP_ENV,
+    DATABASE_URL,
     FRONTEND_URL,
     JWT_SECRET_KEY,
     OLLAMA_MODEL,
@@ -46,10 +47,16 @@ app = FastAPI()
 
 @app.on_event("startup")
 def on_startup() -> None:
-    if os.getenv("RAILWAY_PUBLIC_DOMAIN") and not JWT_SECRET_KEY:
-        raise RuntimeError(
-            "JWT_SECRET_KEY must be set in production (Railway environment)."
-        )
+    if os.getenv("RAILWAY_PUBLIC_DOMAIN"):
+        if not JWT_SECRET_KEY:
+            raise RuntimeError(
+                "JWT_SECRET_KEY must be set in production (Railway environment)."
+            )
+        if not DATABASE_URL:
+            raise RuntimeError(
+                "DATABASE_URL must be set in production to Railway PostgreSQL. "
+                "SQLite is ephemeral and loses all users on redeploy."
+            )
 
     init_db()
     _seed_default_workflow_if_needed()
