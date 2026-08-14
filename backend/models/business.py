@@ -17,6 +17,12 @@ class Business(Base):
     )
     business_name: Mapped[str] = mapped_column(String(160), nullable=False)
     whatsapp_number: Mapped[str] = mapped_column(String(32), nullable=False)
+    whatsapp_phone_number_id: Mapped[str | None] = mapped_column(
+        String(64),
+        unique=True,
+        nullable=True,
+        index=True,
+    )
     onboarding_completed: Mapped[bool] = mapped_column(
         Boolean,
         default=False,
@@ -35,3 +41,8 @@ class Business(Base):
     )
 
     user = relationship("User", back_populates="business")
+    orders = relationship(
+        "Order",
+        back_populates="business",
+        cascade="all, delete-orphan",
+    )

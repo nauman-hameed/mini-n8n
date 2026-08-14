@@ -25,3 +25,6 @@ backend/credentials/
 
 # Logs
 *.log
+
+# Local generated secrets (never commit)
+backend/.n8n-secrets.local

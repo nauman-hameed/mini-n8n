@@ -68,6 +68,10 @@ JWT_ACCESS_TOKEN_EXPIRE_MINUTES = int(
 
 DATABASE_URL = _clean_env(os.getenv("DATABASE_URL"))
 
+# n8n → FastAPI integration (never expose these to the frontend)
+N8N_CALLBACK_SECRET = _clean_env(os.getenv("N8N_CALLBACK_SECRET"))
+N8N_INTERNAL_TOKEN = _clean_env(os.getenv("N8N_INTERNAL_TOKEN"))
+
 AUTH_COOKIE_SECURE = os.getenv("AUTH_COOKIE_SECURE", "").lower() in {
     "1",
     "true",
