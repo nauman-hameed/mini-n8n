@@ -305,6 +305,31 @@ def serialize_order_for_n8n_update(order: Order) -> dict:
     }
 
 
+def serialize_order_for_dashboard(order: Order) -> dict:
+    return {
+        "id": order.id,
+        "orderNumber": order.order_number,
+        "customerName": order.customer_name,
+        "customerPhone": order.customer_phone,
+        "status": order.status,
+        "notes": order.notes,
+        "courier": order.courier,
+        "trackingNumber": order.tracking_number,
+        "shipmentDate": order.shipment_date.isoformat() if order.shipment_date else None,
+        "createdAt": order.created_at.isoformat() if order.created_at else None,
+        "updatedAt": order.updated_at.isoformat() if order.updated_at else None,
+        "items": [
+            {
+                "id": item.id,
+                "name": item.name,
+                "quantity": item.quantity,
+                "unitPrice": float(item.unit_price),
+            }
+            for item in (order.items or [])
+        ],
+    }
+
+
 def serialize_order_internal(order: Order) -> dict:
     return {
         "id": order.id,
@@ -335,6 +360,7 @@ __all__ = [
     "list_orders_for_business",
     "mark_order_shipped",
     "parse_button_order_id",
+    "serialize_order_for_dashboard",
     "serialize_order_for_n8n_create",
     "serialize_order_for_n8n_update",
     "serialize_order_internal",

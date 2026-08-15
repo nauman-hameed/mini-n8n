@@ -9,38 +9,77 @@ import {
   Sparkles,
 } from "lucide-react";
 
+import BusinessSettingsCard from "../components/saas/BusinessSettingsCard";
 import DashboardShell from "../components/saas/DashboardShell";
+import OrdersSection from "../components/saas/OrdersSection";
 import { useAuth } from "../context/AuthContext";
-import { fetchBusiness } from "../utils/authApi";
+import { fetchBusiness, fetchBusinessOrder, fetchBusinessOrders } from "../utils/authApi";
 
 export default function DashboardPage() {
   const { user } = useAuth();
+
   const [business, setBusiness] = useState(null);
+  const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [ordersLoading, setOrdersLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
+  const [ordersError, setOrdersError] = useState("");
+  const [selectedOrder, setSelectedOrder] = useState(null);
+
+  const loadDashboard = async () => {
+    setIsLoading(true);
+    setOrdersLoading(true);
+    setLoadError("");
+    setOrdersError("");
+
+    try {
+      const nextBusiness = await fetchBusiness();
+      setBusiness(nextBusiness);
+    } catch (error) {
+      setLoadError(error.message || "Could not load business details.");
+    } finally {
+      setIsLoading(false);
+    }
+
+    try {
+      const nextOrders = await fetchBusinessOrders();
+      setOrders(nextOrders);
+    } catch (error) {
+      setOrdersError(error.message || "Could not load orders.");
+    } finally {
+      setOrdersLoading(false);
+    }
+  };
 
   useEffect(() => {
-    fetchBusiness()
-      .then(setBusiness)
-      .catch((error) => {
-        setLoadError(error.message || "Could not load business details.");
-      })
-      .finally(() => setIsLoading(false));
+    loadDashboard();
   }, []);
 
   const firstName = user?.full_name?.split(" ")[0] || "there";
+  const whatsappConnected = Boolean(business?.whatsapp_phone_number_id);
+
+  const openOrder = async (order) => {
+    setSelectedOrder(order);
+
+    try {
+      const detail = await fetchBusinessOrder(order.id);
+      setSelectedOrder(detail);
+    } catch {
+      setSelectedOrder(order);
+    }
+  };
 
   return (
     <DashboardShell>
       <section className="dashboard-welcome saas-animate-in">
         <p className="saas-eyebrow">
           <Sparkles size={14} aria-hidden="true" />
-          Setup Complete
+          Business assistant
         </p>
         <h1>Welcome, {firstName}</h1>
         <p>
-          Your business assistant setup is ready for the next step. Connect
-          WhatsApp to activate automation behind the scenes.
+          Track WhatsApp orders and keep your business details up to date.
+          Automation continues to run in the background.
         </p>
       </section>
 
@@ -89,33 +128,39 @@ export default function DashboardPage() {
                 </span>
               </li>
               <li>
-                <span className="badge badge--pending">
+                <span className={whatsappConnected ? "badge badge--success" : "badge badge--pending"}>
                   <Phone size={14} aria-hidden="true" />
-                  WhatsApp Connection · Pending
+                  WhatsApp · {whatsappConnected ? "Connected" : "Not Connected"}
                 </span>
               </li>
               <li>
-                <span className="badge badge--pending">
-                  <Clock size={14} aria-hidden="true" />
-                  Assistant Activation · Pending
+                <span className={whatsappConnected ? "badge badge--success" : "badge badge--pending"}>
+                  {whatsappConnected ? (
+                    <CheckCircle2 size={14} aria-hidden="true" />
+                  ) : (
+                    <Clock size={14} aria-hidden="true" />
+                  )}
+                  Assistant · {whatsappConnected ? "Active" : "Pending"}
                 </span>
               </li>
             </ul>
           </article>
 
-          <article className="dash-card dash-card--wide">
-            <div className="dash-card__head">
-              <div className="dash-card__icon dash-card__icon--indigo">
-                <Sparkles size={20} aria-hidden="true" />
-              </div>
-              <h2>What&apos;s Next</h2>
-            </div>
-            <ol className="next-steps">
-              <li>Connect your WhatsApp Business account</li>
-              <li>Configure assistant behavior for your business</li>
-              <li>Start handling customer conversations automatically</li>
-            </ol>
-          </article>
+          <OrdersSection
+            orders={orders}
+            isLoading={ordersLoading}
+            error={ordersError}
+            selectedOrder={selectedOrder}
+            onSelectOrder={openOrder}
+            onCloseDetail={() => setSelectedOrder(null)}
+          />
+
+          <BusinessSettingsCard
+            business={business}
+            onSaved={(updated) => {
+              setBusiness(updated);
+            }}
+          />
         </div>
       )}
     </DashboardShell>

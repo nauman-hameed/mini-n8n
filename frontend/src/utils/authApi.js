@@ -72,6 +72,39 @@ export async function fetchBusiness() {
   return data.business;
 }
 
+export async function updateBusiness(payload) {
+  const data = await authRequest("/business", {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+
+  return data.business;
+}
+
+export async function fetchBusinessOrders() {
+  const data = await authRequest("/business/orders");
+  return data.orders || [];
+}
+
+export async function fetchBusinessOrder(orderId) {
+  const data = await authRequest(`/business/orders/${orderId}`);
+  return data.order;
+}
+
+export function validateMetaPhoneNumberId(value) {
+  const cleaned = value.trim();
+
+  if (!cleaned) {
+    return "";
+  }
+
+  if (!/^\d{5,64}$/.test(cleaned)) {
+    return "Meta Phone Number ID must be digits only.";
+  }
+
+  return "";
+}
+
 export function isValidEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
 }

@@ -33,8 +33,59 @@ class OnboardingRequest(BaseModel):
         return cleaned
 
 
+class BusinessSettingsRequest(BaseModel):
+    business_name: str | None = Field(default=None, min_length=2, max_length=160)
+    whatsapp_number: str | None = Field(default=None, min_length=8, max_length=32)
+    whatsapp_phone_number_id: str | None = Field(default=None, max_length=64)
+
+    @field_validator("business_name")
+    @classmethod
+    def validate_optional_name(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+
+        cleaned = value.strip()
+
+        if len(cleaned) < 2:
+            raise ValueError("Business name must be at least 2 characters.")
+
+        return cleaned
+
+    @field_validator("whatsapp_number")
+    @classmethod
+    def validate_optional_whatsapp(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+
+        cleaned = value.strip().replace(" ", "").replace("-", "")
+
+        if not WHATSAPP_NUMBER_PATTERN.match(cleaned):
+            raise ValueError(
+                "Enter a valid WhatsApp number with country code, e.g. +923001234567."
+            )
+
+        return cleaned
+
+    @field_validator("whatsapp_phone_number_id")
+    @classmethod
+    def validate_optional_phone_id(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+
+        cleaned = value.strip()
+
+        if not cleaned:
+            return None
+
+        if not cleaned.isdigit() or len(cleaned) > 64:
+            raise ValueError("Meta Phone Number ID must be digits only.")
+
+        return cleaned
+
+
 class BusinessResponse(BaseModel):
     id: int
     business_name: str
     whatsapp_number: str
     onboarding_completed: bool
+    whatsapp_phone_number_id: str | None = None

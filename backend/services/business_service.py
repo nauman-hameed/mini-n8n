@@ -1,3 +1,4 @@
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from models.business import Business
@@ -39,10 +40,61 @@ def save_onboarding(
     return business
 
 
+def update_business_settings(
+    db: Session,
+    *,
+    user_id: int,
+    business_name: str | None = None,
+    whatsapp_number: str | None = None,
+    whatsapp_phone_number_id: str | None = None,
+    clear_phone_number_id: bool = False,
+) -> Business | None:
+    business = get_business_for_user(db, user_id)
+
+    if not business:
+        return None
+
+    if business_name is not None:
+        business.business_name = business_name
+
+    if whatsapp_number is not None:
+        business.whatsapp_number = whatsapp_number
+
+    if clear_phone_number_id:
+        business.whatsapp_phone_number_id = None
+    elif whatsapp_phone_number_id is not None:
+        duplicate = (
+            db.query(Business)
+            .filter(
+                Business.whatsapp_phone_number_id == whatsapp_phone_number_id,
+                Business.id != business.id,
+            )
+            .first()
+        )
+        if duplicate:
+            raise ValueError(
+                "This Meta Phone Number ID is already linked to another business."
+            )
+        business.whatsapp_phone_number_id = whatsapp_phone_number_id
+
+    try:
+        db.commit()
+    except IntegrityError as exc:
+        db.rollback()
+        raise ValueError(
+            "This Meta Phone Number ID is already linked to another business."
+        ) from exc
+
+    db.refresh(business)
+    return business
+
+
 def serialize_business(business: Business) -> dict:
     return {
         "id": business.id,
         "business_name": business.business_name,
         "whatsapp_number": business.whatsapp_number,
         "onboarding_completed": business.onboarding_completed,
+        "whatsapp_phone_number_id": business.whatsapp_phone_number_id,
+        "whatsapp_connected": bool(business.whatsapp_phone_number_id),
     }

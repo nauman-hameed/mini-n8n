@@ -35,6 +35,9 @@ from routes.auth import (
 from routes.business import (
     router as business_router,
 )
+from routes.business_orders import (
+    router as business_orders_router,
+)
 from routes.n8n_api import (
     router as n8n_api_router,
 )
@@ -86,6 +89,7 @@ app.include_router(setup_router)
 # User authentication and business onboarding
 app.include_router(auth_router)
 app.include_router(business_router)
+app.include_router(business_orders_router)
 
 # n8n COD automation contracts
 app.include_router(n8n_api_router)
