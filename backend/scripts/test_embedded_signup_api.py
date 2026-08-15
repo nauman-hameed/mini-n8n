@@ -404,11 +404,23 @@ def main() -> None:
     invalid_biz = fresh_client.get("/business").json()["business"]
     if invalid_biz["whatsapp_connection_status"] != "error" or invalid_biz["whatsapp_connected"]:
         fail(f"invalid code should not connect: {invalid_biz}")
+    if invalid_biz["whatsapp_connection_status"] == "connecting":
+        fail("invalid code left DB status connecting")
     ok("invalid authorization code is rejected without a stored token")
+
+    statuses = []
+
+    def exploding_exchange(_code):
+        db = SessionLocal()
+        user_row = db.query(User).filter(User.email == "new@example.com").one()
+        stored = db.query(Business).filter(Business.user_id == user_row.id).one()
+        statuses.append(stored.whatsapp_connection_status)
+        db.close()
+        raise Exception("code boom")
 
     with patch(
         "services.embedded_signup_service.exchange_embedded_signup_code",
-        side_effect=Exception("code boom"),
+        side_effect=exploding_exchange,
     ):
         failed = fresh_client.post(
             "/business/whatsapp/connect/complete",
@@ -416,9 +428,13 @@ def main() -> None:
         )
     if failed.status_code != 502:
         fail(f"graph failure expected 502, got {failed.status_code} {failed.text}")
+    if "connecting" in statuses:
+        fail("complete persisted connecting before Graph work finished")
     failed_biz = fresh_client.get("/business").json()["business"]
     if failed_biz["whatsapp_connection_status"] != "error":
         fail(f"failed complete should be error, got {failed_biz}")
+    if failed_biz["whatsapp_connection_status"] == "connecting":
+        fail("failed complete left DB status connecting")
     if failed_biz["whatsapp_connected"] or failed_biz["whatsapp_phone_number_id"]:
         fail("partial connected state was stored after Graph failure")
     if "EAA_" in str(failed_biz) or CODE in str(failed.json()):

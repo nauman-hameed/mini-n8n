@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { CheckCircle2, Loader2, Phone } from "lucide-react";
 
 import {
@@ -6,7 +6,11 @@ import {
   disconnectWhatsAppConnection,
   fetchWhatsAppConnectConfig,
 } from "../../utils/authApi";
-import { launchEmbeddedSignup } from "../../utils/embeddedSignup";
+import {
+  INCOMPLETE_CONNECTION_MESSAGE,
+  abortEmbeddedSignup,
+  launchEmbeddedSignup,
+} from "../../utils/embeddedSignup";
 import { getWhatsAppConnectionView } from "../../utils/whatsappConnectionState";
 
 export default function WhatsAppConnectCard({ business, onChanged }) {
@@ -14,6 +18,7 @@ export default function WhatsAppConnectCard({ business, onChanged }) {
   const [uiStatus, setUiStatus] = useState("");
   const [actionError, setActionError] = useState("");
   const [isWorking, setIsWorking] = useState(false);
+  const attemptRef = useRef(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -32,6 +37,7 @@ export default function WhatsAppConnectCard({ business, onChanged }) {
 
     return () => {
       cancelled = true;
+      abortEmbeddedSignup();
     };
   }, []);
 
@@ -40,16 +46,30 @@ export default function WhatsAppConnectCard({ business, onChanged }) {
     [business, connectConfig, uiStatus]
   );
 
-  const runSignup = async () => {
-    if (!connectConfig.enabled || isWorking) {
+  const markIncomplete = () => {
+    attemptRef.current = null;
+    setUiStatus("incomplete");
+    setActionError(INCOMPLETE_CONNECTION_MESSAGE);
+    setIsWorking(false);
+  };
+
+  const cancelAttempt = () => {
+    attemptRef.current?.abort();
+    abortEmbeddedSignup();
+    markIncomplete();
+  };
+
+  const runSignup = () => {
+    if (!connectConfig.enabled) {
       return;
     }
 
+    abortEmbeddedSignup();
     setActionError("");
     setUiStatus("connecting");
     setIsWorking(true);
 
-    await launchEmbeddedSignup({
+    const attempt = launchEmbeddedSignup({
       appId: connectConfig.appId,
       configId: connectConfig.configId,
       graphVersion: connectConfig.graphVersion,
@@ -61,24 +81,28 @@ export default function WhatsAppConnectCard({ business, onChanged }) {
             phoneNumberId,
           });
           setUiStatus("");
+          setActionError("");
           onChanged?.(updated);
         } catch (error) {
           setUiStatus("error");
           setActionError(error.message || "Could not complete WhatsApp connection.");
         } finally {
+          attemptRef.current = null;
           setIsWorking(false);
         }
       },
       onCancel: () => {
-        setUiStatus("");
-        setIsWorking(false);
+        markIncomplete();
       },
       onError: (error) => {
+        attemptRef.current = null;
         setUiStatus("error");
         setActionError(error.message || "Could not start WhatsApp connection.");
         setIsWorking(false);
       },
     });
+
+    attemptRef.current = attempt;
   };
 
   const handleDisconnect = async () => {
@@ -101,6 +125,10 @@ export default function WhatsAppConnectCard({ business, onChanged }) {
   };
 
   const connected = view.state === "connected" || view.state === "legacy_connected";
+  const primaryLabel =
+    view.state === "error" || view.state === "incomplete" || view.state === "connecting"
+      ? "Try Again"
+      : "Connect WhatsApp";
 
   return (
     <article className="dash-card dash-card--wide">
@@ -115,7 +143,14 @@ export default function WhatsAppConnectCard({ business, onChanged }) {
         <div className="whatsapp-connect__status">
           <span className={connected ? "badge badge--success" : view.state === "error" ? "badge badge--cancelled" : "badge badge--pending"}>
             {connected ? <CheckCircle2 size={14} aria-hidden="true" /> : null}
-            {view.title}
+            {view.state === "connecting" ? (
+              <>
+                <Loader2 size={14} className="saas-spinner" aria-hidden="true" />
+                {view.title}
+              </>
+            ) : (
+              view.title
+            )}
           </span>
           {view.detail ? <p className="whatsapp-connect__detail">{view.detail}</p> : null}
           {actionError ? (
@@ -132,21 +167,23 @@ export default function WhatsAppConnectCard({ business, onChanged }) {
         </div>
 
         <div className="whatsapp-connect__actions">
-          {view.state === "connecting" ? (
-            <button type="button" className="saas-btn saas-btn-primary" disabled>
-              <Loader2 size={16} className="saas-spinner" aria-hidden="true" />
-              Connecting to WhatsApp...
-            </button>
-          ) : null}
-
-          {view.state !== "connecting" && view.canConnect ? (
+          {view.canConnect ? (
             <button
               type="button"
               className="saas-btn saas-btn-primary"
               onClick={runSignup}
-              disabled={isWorking}
             >
-              {view.state === "error" ? "Try Again" : "Connect WhatsApp"}
+              {primaryLabel}
+            </button>
+          ) : null}
+
+          {view.canCancel ? (
+            <button
+              type="button"
+              className="saas-btn saas-btn-ghost"
+              onClick={cancelAttempt}
+            >
+              Cancel
             </button>
           ) : null}
 

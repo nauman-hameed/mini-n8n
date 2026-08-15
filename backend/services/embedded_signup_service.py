@@ -21,7 +21,6 @@ from config import (
 )
 from models.business import (
     WHATSAPP_CONNECTION_CONNECTED,
-    WHATSAPP_CONNECTION_CONNECTING,
     WHATSAPP_CONNECTION_DISCONNECTED,
     WHATSAPP_CONNECTION_ERROR,
     WHATSAPP_CONNECTION_TYPE_EMBEDDED_SIGNUP,
@@ -136,8 +135,6 @@ def complete_embedded_signup(
         "display": business.whatsapp_display_phone_number,
         "connected_at": business.whatsapp_connected_at,
     }
-
-    _set_connecting(db, business)
 
     subscribed = False
     access_token = None
@@ -446,13 +443,6 @@ def _reject_duplicate_phone(db: Session, business_id: int, phone_number_id: str)
             status_code=409,
             code="duplicate_phone",
         )
-
-
-def _set_connecting(db: Session, business: Business) -> None:
-    business.whatsapp_connection_status = WHATSAPP_CONNECTION_CONNECTING
-    business.whatsapp_connection_error = None
-    db.commit()
-    db.refresh(business)
 
 
 def _rollback_incomplete_connection(

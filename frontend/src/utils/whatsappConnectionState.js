@@ -1,11 +1,12 @@
 export function getWhatsAppConnectionView(business, connectConfig = {}, uiStatus = "") {
   const isLegacy = business?.whatsapp_connection_type === "legacy";
-  const status = uiStatus || business?.whatsapp_connection_status || "disconnected";
-  const connected = status === "connected" || Boolean(business?.whatsapp_connected);
+  const persistedStatus = business?.whatsapp_connection_status || "disconnected";
   const displayNumber =
     business?.whatsapp_display_phone_number || business?.whatsapp_number || "";
+  const persistedConnected =
+    persistedStatus === "connected" || Boolean(business?.whatsapp_connected);
 
-  if (isLegacy && connected) {
+  if (isLegacy && persistedConnected) {
     return {
       state: "legacy_connected",
       title: "WhatsApp Connected",
@@ -13,21 +14,23 @@ export function getWhatsAppConnectionView(business, connectConfig = {}, uiStatus
       canConnect: false,
       canReconnect: false,
       canDisconnect: false,
+      canCancel: false,
     };
   }
 
-  if (status === "connecting" || uiStatus === "connecting") {
+  if (uiStatus === "connecting") {
     return {
       state: "connecting",
       title: "Connecting to WhatsApp...",
-      detail: "Please finish the Meta window if it is still open.",
-      canConnect: false,
+      detail: "Finish the Meta window if it is still open, or cancel to try again.",
+      canConnect: Boolean(connectConfig.enabled),
       canReconnect: false,
       canDisconnect: false,
+      canCancel: true,
     };
   }
 
-  if (connected) {
+  if (persistedConnected) {
     return {
       state: "connected",
       title: "WhatsApp Connected",
@@ -35,10 +38,11 @@ export function getWhatsAppConnectionView(business, connectConfig = {}, uiStatus
       canConnect: false,
       canReconnect: Boolean(connectConfig.enabled),
       canDisconnect: true,
+      canCancel: false,
     };
   }
 
-  if (status === "error") {
+  if (uiStatus === "error" || persistedStatus === "error") {
     return {
       state: "error",
       title: "Connection failed",
@@ -48,6 +52,19 @@ export function getWhatsAppConnectionView(business, connectConfig = {}, uiStatus
       canConnect: Boolean(connectConfig.enabled),
       canReconnect: false,
       canDisconnect: false,
+      canCancel: false,
+    };
+  }
+
+  if (uiStatus === "incomplete") {
+    return {
+      state: "incomplete",
+      title: "Not connected",
+      detail: "WhatsApp connection was not completed.",
+      canConnect: Boolean(connectConfig.enabled),
+      canReconnect: false,
+      canDisconnect: false,
+      canCancel: false,
     };
   }
 
@@ -60,5 +77,6 @@ export function getWhatsAppConnectionView(business, connectConfig = {}, uiStatus
     canConnect: Boolean(connectConfig.enabled),
     canReconnect: false,
     canDisconnect: false,
+    canCancel: false,
   };
 }
