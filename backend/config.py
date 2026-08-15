@@ -52,6 +52,10 @@ META_VERIFY_TOKEN = os.getenv("META_VERIFY_TOKEN") or (
     else ""
 )
 META_APP_SECRET = _clean_env(os.getenv("META_APP_SECRET"))
+META_APP_ID = _clean_env(os.getenv("META_APP_ID"))
+META_EMBEDDED_SIGNUP_CONFIG_ID = _clean_env(
+    os.getenv("META_EMBEDDED_SIGNUP_CONFIG_ID")
+)
 META_API_VERSION = os.getenv("META_API_VERSION", "v23.0")
 
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")

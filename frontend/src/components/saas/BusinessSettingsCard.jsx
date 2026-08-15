@@ -3,7 +3,6 @@ import { Loader2, Save, Settings } from "lucide-react";
 
 import {
   updateBusiness,
-  validateMetaPhoneNumberId,
   validateWhatsAppNumber,
 } from "../../utils/authApi";
 
@@ -11,7 +10,6 @@ export default function BusinessSettingsCard({ business, onSaved }) {
   const [formData, setFormData] = useState({
     businessName: "",
     whatsappNumber: "",
-    whatsappPhoneNumberId: "",
   });
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState("");
@@ -22,7 +20,6 @@ export default function BusinessSettingsCard({ business, onSaved }) {
     setFormData({
       businessName: business?.business_name || "",
       whatsappNumber: business?.whatsapp_number || "",
-      whatsappPhoneNumberId: business?.whatsapp_phone_number_id || "",
     });
   }, [business]);
 
@@ -47,11 +44,6 @@ export default function BusinessSettingsCard({ business, onSaved }) {
       nextErrors.whatsappNumber = whatsappError;
     }
 
-    const phoneIdError = validateMetaPhoneNumberId(formData.whatsappPhoneNumberId);
-    if (phoneIdError) {
-      nextErrors.whatsappPhoneNumberId = phoneIdError;
-    }
-
     setErrors(nextErrors);
 
     if (Object.keys(nextErrors).length > 0) {
@@ -62,11 +54,9 @@ export default function BusinessSettingsCard({ business, onSaved }) {
       setIsSubmitting(true);
       setSubmitError("");
 
-      const cleanedId = formData.whatsappPhoneNumberId.trim();
       const updated = await updateBusiness({
         business_name: formData.businessName.trim(),
         whatsapp_number: formData.whatsappNumber.trim().replace(/\s+/g, "").replace(/-/g, ""),
-        whatsapp_phone_number_id: cleanedId || null,
       });
 
       setSuccessMessage("Business settings saved.");
@@ -111,24 +101,6 @@ export default function BusinessSettingsCard({ business, onSaved }) {
           />
           {errors.whatsappNumber ? (
             <p className="field-error" role="alert">{errors.whatsappNumber}</p>
-          ) : null}
-        </div>
-
-        <div className={`saas-field ${errors.whatsappPhoneNumberId ? "saas-field--error" : ""}`}>
-          <label htmlFor="settingsPhoneId">Meta Phone Number ID</label>
-          <input
-            id="settingsPhoneId"
-            className="saas-input"
-            inputMode="numeric"
-            placeholder="Optional digits from Meta"
-            value={formData.whatsappPhoneNumberId}
-            onChange={(event) => updateField("whatsappPhoneNumberId", event.target.value)}
-          />
-          <p className="field-hint">
-            Optional. Used by WhatsApp automation to match this business. Digits only.
-          </p>
-          {errors.whatsappPhoneNumberId ? (
-            <p className="field-error" role="alert">{errors.whatsappPhoneNumberId}</p>
           ) : null}
         </div>
 

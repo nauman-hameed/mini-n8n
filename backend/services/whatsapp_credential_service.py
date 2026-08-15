@@ -35,6 +35,7 @@ def store_whatsapp_secrets(
     access_token: str,
     two_step_pin: str | None = None,
     token_expires_at: datetime | None = None,
+    commit: bool = True,
 ) -> WhatsAppCredential:
     token = (access_token or "").strip()
     if not token:
@@ -62,8 +63,10 @@ def store_whatsapp_secrets(
         )
         db.add(row)
 
-    db.commit()
-    db.refresh(row)
+    if commit:
+        db.commit()
+        db.refresh(row)
+
     return row
 
 
@@ -81,9 +84,15 @@ def load_whatsapp_two_step_pin(db: Session, business_id: int) -> str | None:
     return decrypt_secret(row.encrypted_two_step_pin)
 
 
-def delete_whatsapp_secrets(db: Session, business_id: int) -> None:
+def delete_whatsapp_secrets(
+    db: Session,
+    business_id: int,
+    *,
+    commit: bool = True,
+) -> None:
     row = get_whatsapp_credential(db, business_id)
     if not row:
         return
     db.delete(row)
-    db.commit()
+    if commit:
+        db.commit()

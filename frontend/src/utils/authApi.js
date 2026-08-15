@@ -91,6 +91,33 @@ export async function fetchBusinessOrder(orderId) {
   return data.order;
 }
 
+export async function fetchWhatsAppConnectConfig() {
+  const data = await authRequest("/business/whatsapp/connect-config");
+  return {
+    enabled: Boolean(data.enabled),
+    appId: data.appId || "",
+    configId: data.configId || "",
+    graphVersion: data.graphVersion || "",
+  };
+}
+
+export async function completeWhatsAppConnection(payload) {
+  const data = await authRequest("/business/whatsapp/connect/complete", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+
+  return data.business;
+}
+
+export async function disconnectWhatsAppConnection() {
+  const data = await authRequest("/business/whatsapp/disconnect", {
+    method: "POST",
+  });
+
+  return data.business;
+}
+
 export function validateMetaPhoneNumberId(value) {
   const cleaned = value.trim();
 

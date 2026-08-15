@@ -12,6 +12,7 @@ import {
 import BusinessSettingsCard from "../components/saas/BusinessSettingsCard";
 import DashboardShell from "../components/saas/DashboardShell";
 import OrdersSection from "../components/saas/OrdersSection";
+import WhatsAppConnectCard from "../components/saas/WhatsAppConnectCard";
 import { useAuth } from "../context/AuthContext";
 import { fetchBusiness, fetchBusinessOrder, fetchBusinessOrders } from "../utils/authApi";
 
@@ -56,7 +57,7 @@ export default function DashboardPage() {
   }, []);
 
   const firstName = user?.full_name?.split(" ")[0] || "there";
-  const whatsappConnected = Boolean(business?.whatsapp_phone_number_id);
+  const whatsappConnected = Boolean(business?.whatsapp_connected);
 
   const openOrder = async (order) => {
     setSelectedOrder(order);
@@ -153,6 +154,13 @@ export default function DashboardPage() {
             selectedOrder={selectedOrder}
             onSelectOrder={openOrder}
             onCloseDetail={() => setSelectedOrder(null)}
+          />
+
+          <WhatsAppConnectCard
+            business={business}
+            onChanged={(updated) => {
+              setBusiness(updated);
+            }}
           />
 
           <BusinessSettingsCard

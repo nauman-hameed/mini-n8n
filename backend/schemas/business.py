@@ -1,6 +1,6 @@
 import re
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 WHATSAPP_NUMBER_PATTERN = re.compile(r"^\+[1-9]\d{7,14}$")
@@ -98,3 +98,16 @@ class BusinessResponse(BaseModel):
     whatsapp_connection_error: str | None = None
     whatsapp_connected: bool = False
     assistant_active: bool = False
+
+
+class WhatsAppConnectCompleteRequest(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    code: str = Field(min_length=8, max_length=500)
+    waba_id: str = Field(alias="wabaId", min_length=5, max_length=64)
+    phone_number_id: str = Field(alias="phoneNumberId", min_length=5, max_length=64)
+
+    @field_validator("code", "waba_id", "phone_number_id")
+    @classmethod
+    def strip_connect_fields(cls, value: str) -> str:
+        return value.strip()
