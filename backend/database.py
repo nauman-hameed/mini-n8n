@@ -60,11 +60,11 @@ class Base(DeclarativeBase):
 def init_db() -> None:
     DEFAULT_DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 
-    from models import business, order, user  # noqa: F401
-    from services.schema_migration import migrate_orders_schema
+    from models import business, order, user, whatsapp_credential  # noqa: F401
+    from services.schema_migration import migrate_schema
 
     Base.metadata.create_all(bind=engine)
-    migrate_orders_schema(engine)
+    migrate_schema(engine)
 
 
 def get_db():

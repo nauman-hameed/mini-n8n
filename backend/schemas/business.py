@@ -89,3 +89,12 @@ class BusinessResponse(BaseModel):
     whatsapp_number: str
     onboarding_completed: bool
     whatsapp_phone_number_id: str | None = None
+    whatsapp_business_account_id: str | None = None
+    whatsapp_display_phone_number: str | None = None
+    whatsapp_connection_status: str = "disconnected"
+    whatsapp_connection_type: str | None = None
+    whatsapp_connected_at: str | None = None
+    whatsapp_disconnected_at: str | None = None
+    whatsapp_connection_error: str | None = None
+    whatsapp_connected: bool = False
+    assistant_active: bool = False

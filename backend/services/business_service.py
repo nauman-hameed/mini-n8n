@@ -1,7 +1,11 @@
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from models.business import Business
+from models.business import (
+    WHATSAPP_CONNECTION_CONNECTED,
+    WHATSAPP_CONNECTION_DISCONNECTED,
+    Business,
+)
 
 
 def get_business_for_user(db: Session, user_id: int) -> Business | None:
@@ -90,11 +94,31 @@ def update_business_settings(
 
 
 def serialize_business(business: Business) -> dict:
+    status = (
+        business.whatsapp_connection_status
+        or WHATSAPP_CONNECTION_DISCONNECTED
+    )
+    connected = status == WHATSAPP_CONNECTION_CONNECTED
+
     return {
         "id": business.id,
         "business_name": business.business_name,
         "whatsapp_number": business.whatsapp_number,
         "onboarding_completed": business.onboarding_completed,
         "whatsapp_phone_number_id": business.whatsapp_phone_number_id,
-        "whatsapp_connected": bool(business.whatsapp_phone_number_id),
+        "whatsapp_business_account_id": business.whatsapp_business_account_id,
+        "whatsapp_display_phone_number": business.whatsapp_display_phone_number,
+        "whatsapp_connection_status": status,
+        "whatsapp_connection_type": business.whatsapp_connection_type,
+        "whatsapp_connected_at": _isoformat(business.whatsapp_connected_at),
+        "whatsapp_disconnected_at": _isoformat(business.whatsapp_disconnected_at),
+        "whatsapp_connection_error": business.whatsapp_connection_error,
+        "whatsapp_connected": connected,
+        "assistant_active": connected,
     }
+
+
+def _isoformat(value) -> str | None:
+    if value is None:
+        return None
+    return value.isoformat()

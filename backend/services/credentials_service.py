@@ -10,6 +10,28 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 STORAGE_FILE = BASE_DIR / "storage" / "credentials.json"
 
 
+def encrypt_secret(plaintext: str) -> str:
+    """Encrypt a short secret for database storage using CREDENTIAL_ENCRYPTION_KEY."""
+    if not isinstance(plaintext, str) or not plaintext:
+        raise ValueError("Secret plaintext is required.")
+
+    encrypted = _get_cipher().encrypt(plaintext.encode("utf-8"))
+    return encrypted.decode("utf-8")
+
+
+def decrypt_secret(ciphertext: str) -> str:
+    """Decrypt a Fernet secret stored by encrypt_secret()."""
+    if not isinstance(ciphertext, str) or not ciphertext.strip():
+        raise ValueError("Secret ciphertext is required.")
+
+    try:
+        decrypted = _get_cipher().decrypt(ciphertext.encode("utf-8"))
+    except Exception as error:
+        raise ValueError("Stored secret could not be decrypted.") from error
+
+    return decrypted.decode("utf-8")
+
+
 def _get_cipher() -> Fernet:
     if not CREDENTIAL_ENCRYPTION_KEY:
         raise ValueError(

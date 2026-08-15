@@ -76,6 +76,9 @@ def main() -> None:
         business_name="NH",
         whatsapp_number="+923071055454",
         whatsapp_phone_number_id="1160990267106849",
+        whatsapp_display_phone_number="+923071055454",
+        whatsapp_connection_status="connected",
+        whatsapp_connection_type="legacy",
         onboarding_completed=True,
     )
     other_business = Business(
@@ -186,7 +189,18 @@ def main() -> None:
     body = me_business.json().get("business") or {}
     if body.get("whatsapp_phone_number_id") != "1160990267106849":
         fail(f"GET /business missing phone id: {body}")
-    if "N8N_" in str(body) or "token" in "".join(str(body).lower().split()):
+    if body.get("whatsapp_connection_status") != "connected":
+        fail(f"GET /business missing connected status: {body}")
+    if body.get("whatsapp_connection_type") != "legacy":
+        fail(f"GET /business missing legacy type: {body}")
+    if body.get("whatsapp_connected") is not True:
+        fail("GET /business whatsapp_connected should be true")
+    if body.get("assistant_active") is not True:
+        fail("GET /business assistant_active should be true")
+    lowered_keys = " ".join(str(key).lower() for key in body)
+    if "token" in lowered_keys or "pin" in lowered_keys or "encrypted" in lowered_keys:
+        fail("business payload leaked a secret-looking key")
+    if "N8N_" in str(body) or "gAAAA" in str(body):
         fail("business payload looks like it leaked a secret")
     ok("GET /business includes Meta Phone Number ID, no secrets")
 
