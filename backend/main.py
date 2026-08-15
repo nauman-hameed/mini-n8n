@@ -44,6 +44,9 @@ from routes.n8n_api import (
 from routes.internal_orders import (
     router as internal_orders_router,
 )
+from routes.internal_whatsapp import (
+    router as internal_whatsapp_router,
+)
 from database import engine, init_db
 
 
@@ -94,6 +97,7 @@ app.include_router(business_orders_router)
 # n8n COD automation contracts
 app.include_router(n8n_api_router)
 app.include_router(internal_orders_router)
+app.include_router(internal_whatsapp_router)
 
 
 allowed_origins = [

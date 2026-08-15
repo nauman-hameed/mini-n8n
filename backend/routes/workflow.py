@@ -54,4 +54,4 @@ def get_webhook_url() -> str:
     base_url = (BACKEND_URL or "http://localhost:8000").rstrip(
         "/"
     )
-    return f"{base_url}/webhook/whatsapp"
+    return f"{base_url}/webhook/whatsapp/editor"

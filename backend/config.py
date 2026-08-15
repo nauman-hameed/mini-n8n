@@ -51,6 +51,7 @@ META_VERIFY_TOKEN = os.getenv("META_VERIFY_TOKEN") or (
     if os.getenv("RAILWAY_PUBLIC_DOMAIN")
     else ""
 )
+META_APP_SECRET = _clean_env(os.getenv("META_APP_SECRET"))
 META_API_VERSION = os.getenv("META_API_VERSION", "v23.0")
 
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
@@ -71,6 +72,13 @@ DATABASE_URL = _clean_env(os.getenv("DATABASE_URL"))
 # n8n → FastAPI integration (never expose these to the frontend)
 N8N_CALLBACK_SECRET = _clean_env(os.getenv("N8N_CALLBACK_SECRET"))
 N8N_INTERNAL_TOKEN = _clean_env(os.getenv("N8N_INTERNAL_TOKEN"))
+N8N_WHATSAPP_WEBHOOK_URL = _clean_env(os.getenv("N8N_WHATSAPP_WEBHOOK_URL"))
+N8N_WHATSAPP_WEBHOOK_SECRET = _clean_env(
+    os.getenv("N8N_WHATSAPP_WEBHOOK_SECRET")
+) or N8N_CALLBACK_SECRET
+N8N_WHATSAPP_FORWARD_TIMEOUT_SECONDS = int(
+    os.getenv("N8N_WHATSAPP_FORWARD_TIMEOUT_SECONDS", "8")
+)
 
 AUTH_COOKIE_SECURE = os.getenv("AUTH_COOKIE_SECURE", "").lower() in {
     "1",
