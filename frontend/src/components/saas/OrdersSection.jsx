@@ -66,19 +66,19 @@ export default function OrdersSection({
           <span>Total Orders</span>
           <strong>{counts.total}</strong>
         </article>
-        <article className="order-stat">
+        <article className="order-stat order-stat--pending">
           <span>Pending</span>
           <strong>{counts.PENDING}</strong>
         </article>
-        <article className="order-stat">
+        <article className="order-stat order-stat--confirmed">
           <span>Confirmed</span>
           <strong>{counts.CONFIRMED}</strong>
         </article>
-        <article className="order-stat">
+        <article className="order-stat order-stat--cancelled">
           <span>Cancelled</span>
           <strong>{counts.CANCELLED}</strong>
         </article>
-        <article className="order-stat">
+        <article className="order-stat order-stat--shipped">
           <span>Shipped</span>
           <strong>{counts.SHIPPED}</strong>
         </article>

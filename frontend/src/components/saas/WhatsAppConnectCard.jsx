@@ -131,7 +131,7 @@ export default function WhatsAppConnectCard({ business, onChanged }) {
       : "Connect WhatsApp";
 
   return (
-    <article className="dash-card dash-card--wide">
+    <article className={`dash-card dash-card--wide whatsapp-connect-card whatsapp-connect-card--${view.state}`}>
       <div className="dash-card__head">
         <div className="dash-card__icon dash-card__icon--green">
           <Phone size={20} aria-hidden="true" />
@@ -153,6 +153,11 @@ export default function WhatsAppConnectCard({ business, onChanged }) {
             )}
           </span>
           {view.detail ? <p className="whatsapp-connect__detail">{view.detail}</p> : null}
+          {view.state === "connecting" ? (
+            <div className="whatsapp-connect__bar" aria-hidden="true">
+              <span />
+            </div>
+          ) : null}
           {actionError ? (
             <p className="field-error" role="alert">
               {actionError}

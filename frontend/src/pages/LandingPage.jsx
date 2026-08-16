@@ -25,12 +25,30 @@ const STEPS = [
   {
     n: "03",
     title: "Connect WhatsApp",
-    desc: "Link your WhatsApp Business account — coming in the next release.",
+    desc: "Link your WhatsApp Business account from the dashboard in a few steps.",
   },
   {
     n: "04",
     title: "Activate your assistant",
     desc: "Your assistant handles conversations and operations behind the scenes.",
+  },
+];
+
+const FEATURES = [
+  {
+    title: "WhatsApp-native assistant",
+    desc: "Meet customers where they already message you, without building a custom chat stack.",
+    icon: MessageCircle,
+  },
+  {
+    title: "Structured order capture",
+    desc: "Turn conversations into clean records — items, contact details, and status in one place.",
+    icon: ClipboardList,
+  },
+  {
+    title: "Intelligent business replies",
+    desc: "Reduce repetitive work so your team can focus on confirmations, delivery, and growth.",
+    icon: Bot,
   },
 ];
 
@@ -44,6 +62,11 @@ const TRUST_ITEMS = [
 export default function LandingPage() {
   return (
     <div className="saas-page landing-page">
+      <div className="landing-atmosphere" aria-hidden="true">
+        <span className="landing-orb landing-orb--a" />
+        <span className="landing-orb landing-orb--b" />
+        <span className="landing-orb landing-orb--c" />
+      </div>
       <SaasNavbar />
 
       <main>
@@ -52,7 +75,7 @@ export default function LandingPage() {
             <div className="saas-hero__copy saas-animate-in">
               <p className="saas-eyebrow">
                 <Sparkles size={14} aria-hidden="true" />
-                | // AI BUSINESS ASSISTANT |
+                AI BUSINESS ASSISTANT
               </p>
               <h1>Your AI Business Assistant for WhatsApp</h1>
               <p className="saas-lead">
@@ -121,10 +144,38 @@ export default function LandingPage() {
           </div>
         </section>
 
+        <section className="saas-section" id="features">
+          <div className="saas-container">
+            <div className="saas-section-header saas-reveal">
+              <p className="saas-eyebrow">01 — Capabilities</p>
+              <h2>Built for WhatsApp-first operations</h2>
+              <p>
+                A focused assistant for conversations, orders, and follow-through —
+                designed to feel calm, premium, and ready for daily work.
+              </p>
+            </div>
+
+            <div className="feature-grid">
+              {FEATURES.map((feature) => {
+                const Icon = feature.icon;
+                return (
+                  <article key={feature.title} className="feature-card saas-reveal">
+                    <div className="feature-card__icon">
+                      <Icon size={22} aria-hidden="true" />
+                    </div>
+                    <h3>{feature.title}</h3>
+                    <p>{feature.desc}</p>
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
         <section className="saas-section saas-section--muted" id="how-it-works">
           <div className="saas-container">
             <div className="saas-section-header saas-reveal">
-              <p className="saas-eyebrow">01 — How It Works</p>
+              <p className="saas-eyebrow">02 — How It Works</p>
               <h2>From signup to assistant in four steps</h2>
             </div>
 
@@ -143,7 +194,7 @@ export default function LandingPage() {
         <section className="saas-section">
           <div className="saas-container use-case saas-reveal">
             <div className="use-case__copy">
-              <p className="saas-eyebrow">02 — Use Case</p>
+              <p className="saas-eyebrow">03 — Use Case</p>
               <h2>From customer message to organized business data</h2>
               <p>
                 Illustrative preview of how NH will help you understand
